@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mingzhi.mapper.CategoryMapperCustom">
+    <resultMap id="myCategoryVO" type="com.mingzhi.pojo.vo.CategoryVO">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="fatherId" jdbcType="INTEGER" property="fatherId"/>
+        <!--        对应子类list属性名，封装返回的数据-->
+        <collection property="subCategoryList" ofType="com.mingzhi.pojo.vo.SubCategoryVO">
+            <id column="subId" jdbcType="INTEGER" property="subId"/>
+            <result column="subName" jdbcType="VARCHAR" property="subName"/>
+            <result column="subType" jdbcType="INTEGER" property="subType"/>
+            <result column="subFatherId" jdbcType="INTEGER" property="subFatherId"/>
+        </collection>
+    </resultMap>
+
+    <select id="getSubCategoryList" resultMap="myCategoryVO" parameterType="int">
+        SELECT f.id        AS id,
+               f.`name`    AS `name`,
+               f.type      AS type,
+               f.father_id AS fatherId,
+               c.id        AS subId,
+               c.`name`    AS subName,
+               c.type      AS subType,
+               c.father_id AS subFatherId
+        FROM category f
+                 LEFT JOIN category c ON f.id = c.father_id
+        WHERE f.father_id = #{categoryId}
+    </select>
+</mapper>

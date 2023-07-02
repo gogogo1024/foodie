@@ -15,11 +15,11 @@
             <!--            <PatternLayout-->
             <!--                    pattern="[%d{HH:mm:ss.SSS}] %-5level %t  %l  %c- %msg%xEx%n"/>-->
         </Console>
-        <File name="Debug" fileName="debug.log">
-            <PatternLayout>
-                <Pattern>%d %p %c{1.} [%t] %m %ex%n</Pattern>
-            </PatternLayout>
-        </File>
+        <!--        <File name="Debug" fileName="debug.log">-->
+        <!--            <PatternLayout>-->
+        <!--                <Pattern>%d %p %c{1.} [%t] %m %ex%n</Pattern>-->
+        <!--            </PatternLayout>-->
+        <!--        </File>-->
 
         <RollingFile name="RollingFile" fileName="${LOG_HOME}/info.log"
                      filePattern="${LOG_HOME}/$${date:yyyy-MM-dd HH}/info-%d{yyyy-MM-dd}-%i.log">
@@ -37,7 +37,7 @@
         <root level="info">
             <appender-ref ref="RollingFile"/>
             <appender-ref ref="Console"/>
-            <AppenderRef ref="Debug" level="DEBUG"/>
+            <!--            <AppenderRef ref="Debug" level="DEBUG"/>-->
         </root>
     </loggers>
 </configuration>

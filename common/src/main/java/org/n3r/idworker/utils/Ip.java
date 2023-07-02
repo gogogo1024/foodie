@@ -18,9 +18,14 @@ public class Ip {
     static {
         try {
             InetAddress localHostLANAddress = getFirstNonLoopbackAddress();
-            ip = localHostLANAddress.getHostAddress();
+            if (localHostLANAddress != null) {
+                ip = localHostLANAddress.getHostAddress();
+            }
 
-            byte[] address = localHostLANAddress.getAddress();
+            byte[] address = new byte[0];
+            if (localHostLANAddress != null) {
+                address = localHostLANAddress.getAddress();
+            }
             lip = ((address[0] & 0xFFL) << (3 * 8)) +
                     ((address[1] & 0xFFL) << (2 * 8)) +
                     ((address[2] & 0xFFL) << (8)) +
