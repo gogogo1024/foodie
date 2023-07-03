@@ -22,8 +22,8 @@ public class ItemsParam {
     /**
      * 产地 产地，例：中国江苏
      */
-    @Column(name = "produc_place")
-    private String producPlace;
+    @Column(name = "produce_place")
+    private String producePlace;
 
     /**
      * 保质期 保质期，例：180天
@@ -122,19 +122,19 @@ public class ItemsParam {
     /**
      * 获取产地 产地，例：中国江苏
      *
-     * @return produc_place - 产地 产地，例：中国江苏
+     * @return produce_place - 产地 产地，例：中国江苏
      */
     public String getProducPlace() {
-        return producPlace;
+        return producePlace;
     }
 
     /**
      * 设置产地 产地，例：中国江苏
      *
-     * @param producPlace 产地 产地，例：中国江苏
+     * @param producePlace 产地 产地，例：中国江苏
      */
-    public void setProducPlace(String producPlace) {
-        this.producPlace = producPlace;
+    public void setProducPlace(String producePlace) {
+        this.producePlace = producePlace;
     }
 
     /**

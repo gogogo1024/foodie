@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mingzhi.mapper.CategoryMapperCustom">
+    <!--    myCategoryVO-->
     <resultMap id="myCategoryVO" type="com.mingzhi.pojo.vo.CategoryVO">
         <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
@@ -27,5 +28,39 @@
         FROM category f
                  LEFT JOIN category c ON f.id = c.father_id
         WHERE f.father_id = #{categoryId}
+    </select>
+    <!-- myNewItemsVO   -->
+    <resultMap id="myNewItemsVO" type="com.mingzhi.pojo.vo.NewItemsVO">
+        <id column="categoryId" jdbcType="INTEGER" property="categoryId"/>
+        <id column="itemsLength" jdbcType="INTEGER" property="itemsLength"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="slogan" jdbcType="VARCHAR" property="slogan"/>
+        <result column="categoryImage" jdbcType="VARCHAR" property="categoryImage"/>
+        <result column="bgColor" jdbcType="VARCHAR" property="bgColor"/>
+
+        <collection property="simpleItemList" ofType="com.mingzhi.pojo.vo.SimpleItemVO">
+            <id column="itemId" property="itemId"/>
+            <result column="itemName" jdbcType="VARCHAR" property="itemName"/>
+            <result column="itemUrl" jdbcType="VARCHAR" property="itemUrl"/>
+        </collection>
+    </resultMap>
+
+    <select id="getMoreItemsList" resultMap="myNewItemsVO" parameterType="map">
+        SELECT f.id           AS categoryId,
+               f.`name`       AS categoryName,
+               f.slogan       AS slogan,
+               f.cat_image    AS categoryImage,
+               f.bg_color     AS bgColor,
+               i.id           AS itemId,
+               i.item_name    AS itemName,
+               ii.url         AS itemUrl,
+               i.created_time AS createdTime
+        FROM category f
+                 LEFT JOIN items i ON f.id = i.root_cat_id
+                 LEFT JOIN items_img ii ON i.id = ii.item_id
+        WHERE i.root_cat_id = #{paramsMap.categoryId}
+          AND ii.is_main = 1
+        ORDER BY i.created_time DESC LIMIT 0, #{paramsMap.itemsLength}
+
     </select>
 </mapper>

@@ -4,6 +4,7 @@ import com.mingzhi.enums.YesOrNo;
 import com.mingzhi.pojo.Carousel;
 import com.mingzhi.pojo.Category;
 import com.mingzhi.pojo.vo.CategoryVO;
+import com.mingzhi.pojo.vo.NewItemsVO;
 import com.mingzhi.service.CarouselService;
 import com.mingzhi.service.CategoryService;
 import com.mingzhi.utils.MingzhiJSONResult;
@@ -44,15 +45,29 @@ public class IndexController {
     }
 
     @ApiOperation(value = "获取商品分类下的子分类", notes = "获取商品分类下的子分类", httpMethod = "GET")
-    @GetMapping("/suCategory/{categoryId}")
+    @GetMapping("/subCategory/{categoryId}")
     public MingzhiJSONResult subCategory(
             @ApiParam(name = "categoryId", value = "分类id", required = true)
             @PathVariable Integer categoryId) {
         if (categoryId == null) {
-            return MingzhiJSONResult.errorMsg("空字符串");
+            return MingzhiJSONResult.errorMsg("分类不存在");
 
         }
         List<CategoryVO> list = categoryService.getSubCategoryList(categoryId);
+        return MingzhiJSONResult.ok(list);
+    }
+
+    @ApiOperation(value = "获取对应分类下的最新n条商品信息", notes = "获取对应分类下的最新n条商品信息", httpMethod = "GET")
+    @GetMapping("/moreItems/{categoryId}")
+    public MingzhiJSONResult getMoreItemsList(
+            @ApiParam(name = "categoryId", value = "分类id", required = true)
+            @PathVariable Integer categoryId) {
+        if (categoryId == null) {
+            return MingzhiJSONResult.errorMsg("分类不存在");
+
+        }
+        // 默认6个
+        List<NewItemsVO> list = categoryService.getMoreItemsList(categoryId, 6);
         return MingzhiJSONResult.ok(list);
     }
 

@@ -7,7 +7,7 @@
         -->
         <id column="id" jdbcType="VARCHAR" property="id"/>
         <result column="item_id" jdbcType="VARCHAR" property="itemId"/>
-        <result column="produc_place" jdbcType="VARCHAR" property="producPlace"/>
+        <result column="produce_place" jdbcType="VARCHAR" property="producePlace"/>
         <result column="foot_period" jdbcType="VARCHAR" property="footPeriod"/>
         <result column="brand" jdbcType="VARCHAR" property="brand"/>
         <result column="factory_name" jdbcType="VARCHAR" property="factoryName"/>
