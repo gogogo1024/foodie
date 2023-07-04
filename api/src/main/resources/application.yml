@@ -35,7 +35,10 @@ mapper:
   mappers: com.mingzhi.my.mapper.MyMapper
   not-empty: false
   identity: MYSQL
-
+# mybatis-pageHelper配置
+pagehelper:
+  helperDialect: mysql
+  supportMethodsArguments: true
 
 logging:
   #  level.org.springframework.boot.autoconfigure: error #spring的自动装配日志只打error，否则debug输出的会打印很多自动装配的log信息到控制台
