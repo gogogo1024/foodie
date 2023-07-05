@@ -7,6 +7,7 @@ import com.mingzhi.pojo.ItemsParam;
 import com.mingzhi.pojo.ItemsSpec;
 import com.mingzhi.pojo.vo.CommentLevelCountsVO;
 import com.mingzhi.pojo.vo.ItemInfoVO;
+import com.mingzhi.pojo.vo.ShopCartVO;
 import com.mingzhi.service.ItemService;
 import com.mingzhi.utils.MingzhiJSONResult;
 import com.mingzhi.utils.PagedGridResult;
@@ -80,5 +81,50 @@ public class ItemsController {
         PagedGridResult pagedGridResult = itemService.queryComments(itemId, commentLevel, page, pageSize);
         return MingzhiJSONResult.ok(pagedGridResult);
     }
+
+
+    @ApiOperation(value = "搜索商品", notes = "搜索商品", httpMethod = "GET")
+    @GetMapping("/search")
+    public MingzhiJSONResult searchItems(
+            @ApiParam(name = "keywords", value = "商品关键字")
+            @RequestParam String keywords,
+            @ApiParam(name = "sort", value = "排序依据", required = false, defaultValue = "k")
+            @RequestParam String sort,
+            @ApiParam(name = "page", value = "第几页", required = false, defaultValue = "1")
+            @RequestParam Integer page,
+            @ApiParam(name = "pageSize", value = "分页条数", required = false, defaultValue = "10")
+            @RequestParam Integer pageSize) {
+        PagedGridResult pagedGridResult = itemService.searchItems(keywords, sort, page, pageSize);
+        return MingzhiJSONResult.ok(pagedGridResult);
+    }
+
+    @ApiOperation(value = "搜索商品通过商品分类", notes = "搜索商品通过商品分类", httpMethod = "GET")
+    @GetMapping("/catItems")
+    public MingzhiJSONResult searchItemsByThirdCategory(
+            @ApiParam(name = "catId", value = "商品关键字")
+            @RequestParam Integer catId,
+            @ApiParam(name = "sort", value = "排序依据", required = false, defaultValue = "k")
+            @RequestParam String sort,
+            @ApiParam(name = "page", value = "第几页", required = false, defaultValue = "1")
+            @RequestParam Integer page,
+            @ApiParam(name = "pageSize", value = "分页条数", required = false, defaultValue = "10")
+            @RequestParam Integer pageSize) {
+        PagedGridResult pagedGridResult = itemService.searchItemsByThirdCategory(catId, sort, page, pageSize);
+        return MingzhiJSONResult.ok(pagedGridResult);
+    }
+
+    @ApiOperation(value = "根据商品规格ids查询商品数据", notes = "根据商品规格ids查询商品数据", httpMethod = "GET")
+    @GetMapping("/refresh")
+    public MingzhiJSONResult queryItemsBySpecIds(
+            @ApiParam(name = "itemSpecIds", value = "商品规格ids", required = true, example = "1001,1003,1005")
+            @RequestParam String itemSpecIds
+    ) {
+        if (StringUtils.isBlank(itemSpecIds)) {
+            return MingzhiJSONResult.ok();
+        }
+        List<ShopCartVO> list = itemService.queryItemsBySpecIds(itemSpecIds);
+        return MingzhiJSONResult.ok(list);
+    }
+
 
 }

@@ -70,8 +70,9 @@ public class PassportController {
                 "createdTime",
         });
         CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(user), true);
+        //TODO 生成用户token,会话存入redis
+        //TODO 同步购物车数据
         return MingzhiJSONResult.ok();
-
     }
 
     @ApiOperation(value = "用户登录", notes = "用户登录", httpMethod = "POST")

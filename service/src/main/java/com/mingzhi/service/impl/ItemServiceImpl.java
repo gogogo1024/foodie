@@ -7,6 +7,8 @@ import com.mingzhi.mapper.*;
 import com.mingzhi.pojo.*;
 import com.mingzhi.pojo.vo.CommentLevelCountsVO;
 import com.mingzhi.pojo.vo.ItemCommentVO;
+import com.mingzhi.pojo.vo.SearchItemsVO;
+import com.mingzhi.pojo.vo.ShopCartVO;
 import com.mingzhi.service.ItemService;
 import com.mingzhi.utils.DesensitizationUtil;
 import com.mingzhi.utils.PagedGridResult;
@@ -17,9 +19,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -150,6 +150,63 @@ public class ItemServiceImpl implements ItemService {
         }
         PagedGridResult pagedGridResult = new PagedGridResult();
         return pagedGridResult.setterPagedGrid(list, page);
+    }
+
+    /**
+     * 根据商品id，排序方式查询商品列表
+     *
+     * @param keywords 搜索关键字
+     * @param sort     排序方式
+     * @param page     第几页
+     * @param pageSize 每页多少条
+     * @return 关键字对应商品列表
+     */
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public PagedGridResult searchItems(String keywords, String sort, Integer page, Integer pageSize) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("keywords", keywords);
+        map.put("sort", sort);
+        PageHelper.startPage(page, pageSize);
+        List<SearchItemsVO> list = itemsMapperCustom.searchItems(map);
+        PagedGridResult pagedGridResult = new PagedGridResult();
+        return pagedGridResult.setterPagedGrid(list, page);
+    }
+
+    /**
+     * 根据商品id,排序方式查询商品列表
+     *
+     * @param catId    商品id
+     * @param sort     排序方式
+     * @param page     第几页
+     * @param pageSize 每页多少条
+     * @return 商品评论列表
+     */
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public PagedGridResult searchItemsByThirdCategory(Integer catId, String sort, Integer page, Integer pageSize) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("catId", catId);
+        map.put("sort", sort);
+        PageHelper.startPage(page, pageSize);
+        List<SearchItemsVO> list = itemsMapperCustom.searchItemsByThirdCategory(map);
+        PagedGridResult pagedGridResult = new PagedGridResult();
+        return pagedGridResult.setterPagedGrid(list, page);
+    }
+
+    /**
+     * 根据商品规格ids，查询购物车商品列表
+     *
+     * @param specIds 商品规格ids
+     * @return 购物车商品列表
+     */
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public List<ShopCartVO> queryItemsBySpecIds(String specIds) {
+        String[] ids = specIds.split(",");
+        List<String> specIdsList = new ArrayList<>();
+        Collections.addAll(specIdsList, ids);
+        return itemsMapperCustom.queryItemsBySpecIds(specIdsList);
     }
 
 }
