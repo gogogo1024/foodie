@@ -5,10 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.mingzhi.enums.CommentLevel;
 import com.mingzhi.mapper.*;
 import com.mingzhi.pojo.*;
-import com.mingzhi.pojo.vo.CommentLevelCountsVO;
-import com.mingzhi.pojo.vo.ItemCommentVO;
-import com.mingzhi.pojo.vo.SearchItemsVO;
-import com.mingzhi.pojo.vo.ShopCartVO;
+import com.mingzhi.pojo.vo.*;
 import com.mingzhi.service.ItemService;
 import com.mingzhi.utils.DesensitizationUtil;
 import com.mingzhi.utils.PagedGridResult;
@@ -209,4 +206,19 @@ public class ItemServiceImpl implements ItemService {
         return itemsMapperCustom.queryItemsBySpecIds(specIdsList);
     }
 
+
+    /**
+     * 根据商品规格id，查询商品规格信息
+     *
+     * @param specIds 商品规格id
+     * @return 商品规格信息列表
+     */
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public List<ItemSpecVO> queryItemsSpecBySpecIds(String specIds) {
+        String[] ids = specIds.split(",");
+        List<String> specIdsList = new ArrayList<>();
+        Collections.addAll(specIdsList, ids);
+        return itemsMapperCustom.queryItemsSpecBySpecIds(specIdsList);
+    }
 }

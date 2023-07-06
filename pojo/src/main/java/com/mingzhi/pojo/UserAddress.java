@@ -52,7 +52,7 @@ public class UserAddress {
     /**
      * 扩展字段
      */
-    private String extand;
+    private String extend;
 
     /**
      * 是否默认地址
@@ -84,7 +84,8 @@ public class UserAddress {
     /**
      * 设置地址主键id
      *
-     * @param id 地址主键id
+     * @param id        地址主键id
+     * @param addressId
      */
     public void setId(String id) {
         this.id = id;
@@ -219,19 +220,19 @@ public class UserAddress {
     /**
      * 获取扩展字段
      *
-     * @return extand - 扩展字段
+     * @return extend - 扩展字段
      */
     public String getExtand() {
-        return extand;
+        return extend;
     }
 
     /**
      * 设置扩展字段
      *
-     * @param extand 扩展字段
+     * @param extend 扩展字段
      */
-    public void setExtand(String extand) {
-        this.extand = extand;
+    public void setExtand(String extend) {
+        this.extend = extend;
     }
 
     /**

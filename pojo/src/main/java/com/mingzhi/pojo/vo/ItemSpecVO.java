@@ -1,11 +1,23 @@
 package com.mingzhi.pojo.vo;
 
+import io.swagger.models.auth.In;
+
 /**
- * 购物车VO
+ * 购物车结算VO
  */
-public class ShopCartVO {
+public class ItemSpecVO {
+    private String itemSpecId;
     private String itemId;
     private String itemImgUrl;
+
+    public String getItemSpecId() {
+        return itemSpecId;
+    }
+
+    public void setItemSpecId(String itemSpecId) {
+        this.itemSpecId = itemSpecId;
+    }
+
     private String itemName;
     private String specId;
 
@@ -54,16 +66,16 @@ public class ShopCartVO {
         return priceDiscount;
     }
 
+    public void setPriceDiscount(Integer priceDiscount) {
+        this.priceDiscount = priceDiscount;
+    }
+
     public Integer getPriceNormal() {
         return priceNormal;
     }
 
     public void setPriceNormal(Integer priceNormal) {
         this.priceNormal = priceNormal;
-    }
-
-    public void setPriceDiscount(Integer priceDiscount) {
-        this.priceDiscount = priceDiscount;
     }
 
     private String specName;

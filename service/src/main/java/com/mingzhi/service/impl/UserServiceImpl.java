@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
      * @param userBO userBO
      * @return 用户
      */
-    @Transactional(propagation = Propagation.SUPPORTS)
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public Users createUser(UserBO userBO) {
         Users user = new Users();

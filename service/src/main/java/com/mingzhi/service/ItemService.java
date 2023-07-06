@@ -6,6 +6,7 @@ import com.mingzhi.pojo.ItemsParam;
 import com.mingzhi.pojo.ItemsSpec;
 import com.mingzhi.pojo.vo.CommentLevelCountsVO;
 import com.mingzhi.pojo.vo.ItemCommentVO;
+import com.mingzhi.pojo.vo.ItemSpecVO;
 import com.mingzhi.pojo.vo.ShopCartVO;
 import com.mingzhi.utils.PagedGridResult;
 
@@ -95,5 +96,12 @@ public interface ItemService {
      */
     public List<ShopCartVO> queryItemsBySpecIds(String specIds);
 
+    /**
+     * 根据商品规格id，查询商品规格信息列表
+     *
+     * @param specIds 商品规格ids
+     * @return 商品规格信息列表
+     */
+    public List<ItemSpecVO> queryItemsSpecBySpecIds(String specIds);
 
 }

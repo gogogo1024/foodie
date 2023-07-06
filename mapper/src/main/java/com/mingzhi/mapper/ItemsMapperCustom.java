@@ -2,6 +2,7 @@ package com.mingzhi.mapper;
 
 
 import com.mingzhi.pojo.vo.ItemCommentVO;
+import com.mingzhi.pojo.vo.ItemSpecVO;
 import com.mingzhi.pojo.vo.SearchItemsVO;
 import com.mingzhi.pojo.vo.ShopCartVO;
 import org.apache.ibatis.annotations.Param;
@@ -17,6 +18,8 @@ public interface ItemsMapperCustom {
     public List<SearchItemsVO> searchItemsByThirdCategory(@Param("paramsMap") Map<String, Object> map);
 
     public List<ShopCartVO> queryItemsBySpecIds(@Param("paramsList") List specIdsList);
+
+    public List<ItemSpecVO> queryItemsSpecBySpecIds(@Param("paramsList") List specIdsList);
 
 
 }

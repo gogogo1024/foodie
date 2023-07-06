@@ -84,7 +84,7 @@
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>2.1.0</version>
+            <version>3.0.2</version>
         </dependency>
         <!-- mybatis-pageHelper-->
         <dependency>
@@ -97,7 +97,7 @@
         <dependency>
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper-spring-boot-starter</artifactId>
-            <version>2.1.5</version>
+            <version>4.2.0</version>
         </dependency>
         <!--        apache工具类 -->
         <dependency>
@@ -142,6 +142,8 @@
         <!--            <artifactId>spring-plugin-core</artifactId>-->
         <!--            <version>2.0.0.RELEASE</version>-->
         <!--        </dependency>-->
+
     </dependencies>
+
 
 </project>

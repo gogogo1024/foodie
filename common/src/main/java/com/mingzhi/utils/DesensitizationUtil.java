@@ -1,6 +1,5 @@
 package com.mingzhi.utils;
 
-import sun.applet.Main;
 
 /**
  * 脱敏工具类
@@ -45,17 +44,17 @@ public class DesensitizationUtil {
                     stringBuilder.append(SYMBOL);
                 }
                 if ((pamathree == 0 && SIZE / 2 == 0) || (pamathree != 0 && SIZE % 2 != 0)) {
-                    stringBuilder.append(value.substring(len - pamafive, len));
+                    stringBuilder.append(value, len - pamafive, len);
                 } else {
-                    stringBuilder.append(value.substring(len - (pamafive + 1), len));
+                    stringBuilder.append(value, len - (pamafive + 1), len);
                 }
             } else {
                 int pamafour = len - 2;
-                stringBuilder.append(value.substring(0, 1));
+                stringBuilder.append(value.charAt(0));
                 for (int i = 0; i < pamafour; i++) {
                     stringBuilder.append(SYMBOL);
                 }
-                stringBuilder.append(value.substring(len - 1, len));
+                stringBuilder.append(value.charAt(len - 1));
             }
         }
         return stringBuilder.toString();
