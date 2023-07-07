@@ -2,6 +2,7 @@ package com.mingzhi.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+//import com.mingzhi.enums.CommentLevel;
 import com.mingzhi.enums.CommentLevel;
 import com.mingzhi.mapper.*;
 import com.mingzhi.pojo.*;
@@ -220,5 +221,23 @@ public class ItemServiceImpl implements ItemService {
         List<String> specIdsList = new ArrayList<>();
         Collections.addAll(specIdsList, ids);
         return itemsMapperCustom.queryItemsSpecBySpecIds(specIdsList);
+    }
+
+    /**
+     * 减少库存
+     *
+     * @param specId    商品规格id
+     * @param buyCounts 购买数量
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void decreaseItemSpecStock(String specId, Integer buyCounts) {
+        // TODO 分布式锁处理减库存
+
+        int result = itemsMapperCustom.decreaseItemSpecStock(specId, buyCounts);
+        if (result != 1) {
+            throw new RuntimeException("订单创建失败：库存不足");
+
+        }
     }
 }

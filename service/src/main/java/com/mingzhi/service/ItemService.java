@@ -104,4 +104,13 @@ public interface ItemService {
      */
     public List<ItemSpecVO> queryItemsSpecBySpecIds(String specIds);
 
+    /**
+     * 减少库存
+     *
+     * @param specId    商品规格id
+     * @param buyCounts 购买数量
+     */
+
+    public void decreaseItemSpecStock(String specId, Integer buyCounts);
+
 }

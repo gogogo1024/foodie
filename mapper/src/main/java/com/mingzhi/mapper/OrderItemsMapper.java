@@ -6,6 +6,3 @@ import tk.mybatis.mapper.additional.insert.InsertListMapper;
 
 public interface OrderItemsMapper extends MyMapper<OrderItems>, InsertListMapper<OrderItems> {
 }
-
-//public interface OrderItemsMapper extends InsertListMapper<OrderItems> {
-//}

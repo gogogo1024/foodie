@@ -1,14 +1,18 @@
 package com.mingzhi.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
+@Tag(name = "hello", description = "hello测试接口")
 @RestController()
+@ResponseBody()
 public class HelloController {
     final static Logger logger = LoggerFactory.getLogger(HelloController.class);
 

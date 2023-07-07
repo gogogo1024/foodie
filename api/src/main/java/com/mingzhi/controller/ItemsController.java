@@ -1,6 +1,5 @@
 package com.mingzhi.controller;
 
-import com.mingzhi.enums.CommentLevel;
 import com.mingzhi.pojo.Items;
 import com.mingzhi.pojo.ItemsImg;
 import com.mingzhi.pojo.ItemsParam;
@@ -11,9 +10,9 @@ import com.mingzhi.pojo.vo.ShopCartVO;
 import com.mingzhi.service.ItemService;
 import com.mingzhi.utils.MingzhiJSONResult;
 import com.mingzhi.utils.PagedGridResult;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,18 +21,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Api(value = "商品接口", tags = {"商品信息展示"})
+@Tag(name = "商品接口", description = "商品信息展示")
 @RestController()
+@ResponseBody()
 @RequestMapping("items")
 public class ItemsController {
     final static Logger logger = LoggerFactory.getLogger(ItemsController.class);
     @Autowired
     private ItemService itemService;
 
-    @ApiOperation(value = "查询商品详情", notes = "查询商品详情", httpMethod = "GET")
+    @Operation(summary = "查询商品详情", description = "查询商品详情", method = "GET")
     @GetMapping("/info/{itemId}")
     public MingzhiJSONResult info(
-            @ApiParam(name = "itemId", value = "商品id", required = true)
+            @Parameter(name = "itemId", required = true)
             @PathVariable String itemId) {
         if (StringUtils.isBlank(itemId)) {
             return MingzhiJSONResult.errorMsg(null);
@@ -51,10 +51,10 @@ public class ItemsController {
         return MingzhiJSONResult.ok(itemInfoVO);
     }
 
-    @ApiOperation(value = "查询商品评价等级以及评价数", notes = "查询商品评价等级以及评价数", httpMethod = "GET")
+    @Operation(summary = "查询商品评价等级以及评价数", description = "查询商品评价等级以及评价数", method = "GET")
     @GetMapping("/commentLevel")
     public MingzhiJSONResult commentLevelCounts(
-            @ApiParam(name = "itemId", value = "商品id", required = true)
+            @Parameter(name = "itemId", required = true)
             @RequestParam String itemId
     ) {
         if (StringUtils.isBlank(itemId)) {
@@ -64,16 +64,16 @@ public class ItemsController {
         return MingzhiJSONResult.ok(commentLevelCountsVO);
     }
 
-    @ApiOperation(value = "查询商品评价", notes = "查询商品评价", httpMethod = "GET")
+    @Operation(summary = "查询商品评价", description = "查询商品评价", method = "GET")
     @GetMapping("/comments")
     public MingzhiJSONResult comment(
-            @ApiParam(name = "itemId", value = "商品id", required = true)
+            @Parameter(name = "itemId", required = true)
             @RequestParam String itemId,
-            @ApiParam(name = "commentLevel", value = "评价等级", required = false, defaultValue = "1")
+            @Parameter(name = "commentLevel", required = false, example = "1")
             @RequestParam Integer commentLevel,
-            @ApiParam(name = "page", value = "第几页", required = false, defaultValue = "1")
+            @Parameter(name = "page", required = false, example = "1")
             @RequestParam Integer page,
-            @ApiParam(name = "pageSize", value = "分页条数", required = false, defaultValue = "10")
+            @Parameter(name = "pageSize", required = false, example = "10")
             @RequestParam Integer pageSize) {
         if (StringUtils.isBlank(itemId)) {
             return MingzhiJSONResult.errorMsg(null);
@@ -83,40 +83,40 @@ public class ItemsController {
     }
 
 
-    @ApiOperation(value = "搜索商品", notes = "搜索商品", httpMethod = "GET")
+    @Operation(summary = "搜索商品", description = "搜索商品", method = "GET")
     @GetMapping("/search")
     public MingzhiJSONResult searchItems(
-            @ApiParam(name = "keywords", value = "商品关键字")
+            @Parameter(name = "keywords")
             @RequestParam String keywords,
-            @ApiParam(name = "sort", value = "排序依据", required = false, defaultValue = "k")
+            @Parameter(name = "sort", required = false, example = "k")
             @RequestParam String sort,
-            @ApiParam(name = "page", value = "第几页", required = false, defaultValue = "1")
+            @Parameter(name = "page", required = false, example = "1")
             @RequestParam Integer page,
-            @ApiParam(name = "pageSize", value = "分页条数", required = false, defaultValue = "10")
+            @Parameter(name = "pageSize", required = false, example = "10")
             @RequestParam Integer pageSize) {
         PagedGridResult pagedGridResult = itemService.searchItems(keywords, sort, page, pageSize);
         return MingzhiJSONResult.ok(pagedGridResult);
     }
 
-    @ApiOperation(value = "搜索商品通过商品分类", notes = "搜索商品通过商品分类", httpMethod = "GET")
+    @Operation(summary = "搜索商品通过商品分类", description = "搜索商品通过商品分类", method = "GET")
     @GetMapping("/catItems")
     public MingzhiJSONResult searchItemsByThirdCategory(
-            @ApiParam(name = "catId", value = "商品关键字")
+            @Parameter(name = "catId")
             @RequestParam Integer catId,
-            @ApiParam(name = "sort", value = "排序依据", required = false, defaultValue = "k")
+            @Parameter(name = "sort", required = false, example = "k")
             @RequestParam String sort,
-            @ApiParam(name = "page", value = "第几页", required = false, defaultValue = "1")
+            @Parameter(name = "page", required = false, example = "1")
             @RequestParam Integer page,
-            @ApiParam(name = "pageSize", value = "分页条数", required = false, defaultValue = "10")
+            @Parameter(name = "pageSize", required = false, example = "10")
             @RequestParam Integer pageSize) {
         PagedGridResult pagedGridResult = itemService.searchItemsByThirdCategory(catId, sort, page, pageSize);
         return MingzhiJSONResult.ok(pagedGridResult);
     }
 
-    @ApiOperation(value = "根据商品规格ids查询商品数据", notes = "根据商品规格ids查询商品数据", httpMethod = "GET")
+    @Operation(summary = "根据商品规格ids查询商品数据", description = "根据商品规格ids查询商品数据", method = "GET")
     @GetMapping("/refresh")
     public MingzhiJSONResult queryItemsBySpecIds(
-            @ApiParam(name = "itemSpecIds", value = "商品规格ids", required = true, example = "1001,1003,1005")
+            @Parameter(name = "itemSpecIds", required = true, example = "1001,1003,1005")
             @RequestParam String itemSpecIds
     ) {
         if (StringUtils.isBlank(itemSpecIds)) {

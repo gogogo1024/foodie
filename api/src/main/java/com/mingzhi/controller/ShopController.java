@@ -4,21 +4,21 @@ import com.mingzhi.pojo.bo.ShopCartBO;
 import com.mingzhi.service.CarouselService;
 import com.mingzhi.service.CategoryService;
 import com.mingzhi.utils.MingzhiJSONResult;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-@Api(value = "购物车", tags = {"购物车相关接口"})
+@Tag(name = "购物车", description = "购物车相关接口")
 @RestController()
+@ResponseBody()
 @RequestMapping("shopcart")
 public class ShopController {
     final static Logger logger = LoggerFactory.getLogger(ShopController.class);
@@ -27,12 +27,12 @@ public class ShopController {
     @Autowired
     private CategoryService categoryService;
 
-    @ApiOperation(value = "添加商品到购物车", notes = "添加商品到购物车", httpMethod = "POST")
+    @Operation(summary = "添加商品到购物车", description = "添加商品到购物车", method = "POST")
     @PostMapping("/add")
     public MingzhiJSONResult add(
-            @ApiParam(name = "userId", value = "用户id", required = true)
+            @Parameter(name = "userId", required = true)
             @RequestParam String userId,
-            @ApiParam(name = "shopCartBO", value = "购物车VO", required = true)
+            @Parameter(name = "shopCartBO", required = true)
             @RequestBody ShopCartBO shopCartBO,
             HttpServletRequest request,
             HttpServletResponse response
@@ -46,12 +46,12 @@ public class ShopController {
         return MingzhiJSONResult.ok();
     }
 
-    @ApiOperation(value = "刷新购物车数据", notes = "刷新购物车数据", httpMethod = "POST")
+    @Operation(summary = "刷新购物车数据", description = "刷新购物车数据", method = "POST")
     @PostMapping("/refresh")
     public MingzhiJSONResult refreshShopcart(
-            @ApiParam(name = "userId", value = "用户id", required = true)
+            @Parameter(name = "userId", required = true)
             @RequestParam String userId,
-            @ApiParam(name = "shopCartBO", value = "购物车VO", required = true)
+            @Parameter(name = "shopCartBO", required = true)
             @RequestBody ShopCartBO shopCartBO,
             HttpServletRequest request,
             HttpServletResponse response
@@ -65,12 +65,12 @@ public class ShopController {
         return MingzhiJSONResult.ok();
     }
 
-    @ApiOperation(value = "从购物车移除商品", notes = "从购物车移除商品", httpMethod = "DELETE")
+    @Operation(summary = "从购物车移除商品", description = "从购物车移除商品", method = "DELETE")
     @DeleteMapping("/del")
     public MingzhiJSONResult delete(
-            @ApiParam(name = "userId", value = "用户id", required = true)
+            @Parameter(name = "userId", required = true)
             @RequestParam String userId,
-            @ApiParam(name = "itemSpecId", value = " 商品规格id", required = true)
+            @Parameter(name = "itemSpecId", required = true)
             @RequestParam String itemSpecId,
             HttpServletRequest request,
             HttpServletResponse response

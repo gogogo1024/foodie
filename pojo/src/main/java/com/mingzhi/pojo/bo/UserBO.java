@@ -1,15 +1,12 @@
 package com.mingzhi.pojo.bo;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
-@ApiModel(value = "用户对象模型", description = "用户传入数据实体模型")
+//@Schema(name = "用户对象模型", description = "用户传入数据实体模型")
 public class UserBO {
-    @ApiModelProperty(value = "用户名", name = "username", required = true)
+    //    @Schema(name = "username")
     private String username;
-    @ApiModelProperty(value = "用户密码", name = "password", required = true)
+    //    @Schema(name = "用户密码")
     private String password;
-    @ApiModelProperty(value = "用户确认密码", name = "confirmPassword", required = false)
+    //    @Schema(name = "用户确认密码")
     private String confirmPassword;
 
     public String getUsername() {

@@ -2,26 +2,24 @@ package com.mingzhi.service.impl;
 
 import com.mingzhi.enums.OrderStatusEnum;
 import com.mingzhi.enums.YesOrNo;
-import com.mingzhi.mapper.CarouselMapper;
 import com.mingzhi.mapper.OrderItemsMapper;
 import com.mingzhi.mapper.OrderStatusMapper;
 import com.mingzhi.mapper.OrdersMapper;
-import com.mingzhi.pojo.*;
+import com.mingzhi.pojo.OrderItems;
+import com.mingzhi.pojo.OrderStatus;
+import com.mingzhi.pojo.Orders;
+import com.mingzhi.pojo.UserAddress;
 import com.mingzhi.pojo.bo.SubmitOrderBO;
 import com.mingzhi.pojo.vo.ItemSpecVO;
 import com.mingzhi.service.AddressService;
-import com.mingzhi.service.CarouselService;
 import com.mingzhi.service.ItemService;
 import com.mingzhi.service.OrderService;
-import org.apache.tomcat.jni.Address;
-import org.aspectj.weaver.ast.Or;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import tk.mybatis.mapper.entity.Example;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -94,6 +92,8 @@ public class OrderServiceImpl implements OrderService {
 //            orderItems.setBuyCounts(buyCounts);
 //            orderItems.setItemSpecId(itemSpecVO.getSpecId());
 //            orderItems.setItemSpecName(itemSpecVO.getSpecName());
+
+            // {itemId:buyCounts:itemSpecId} group by itemId sum buyCounts
             String[] ignoreProperties = new String[]{
                     "priceNormal",
 //                    "priceDiscount",
@@ -102,6 +102,8 @@ public class OrderServiceImpl implements OrderService {
             orderItems.setId(sid.nextShort());
             orderItems.setOrderId(orderId);
             list.add(orderItems);
+            //  减库存
+            itemService.decreaseItemSpecStock(itemSpecVO.getItemId(), buyCounts);
         }
         // 1. 订单详情
         orderItemsMapper.insertList(list);
@@ -111,12 +113,12 @@ public class OrderServiceImpl implements OrderService {
         // 2. 订单保存
         ordersMapper.insert(order);
 
+
         // 3. 订单状态
         OrderStatus orderStatus = new OrderStatus();
         orderStatus.setOrderId(orderId);
         orderStatus.setOrderStatus(OrderStatusEnum.WAIT_PAY.type);
         currentDate = new Date();
-        orderStatus.setCreatedTime(currentDate);
         orderStatus.setCreatedTime(currentDate);
         orderStatusMapper.insert(orderStatus);
     }

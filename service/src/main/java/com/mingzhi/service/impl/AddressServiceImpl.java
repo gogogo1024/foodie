@@ -1,22 +1,17 @@
 package com.mingzhi.service.impl;
 
 import com.mingzhi.enums.YesOrNo;
-import com.mingzhi.mapper.CarouselMapper;
 import com.mingzhi.mapper.UserAddressMapper;
-import com.mingzhi.pojo.Carousel;
 import com.mingzhi.pojo.UserAddress;
 import com.mingzhi.pojo.bo.AddressBO;
 import com.mingzhi.service.AddressService;
-import com.mingzhi.service.CarouselService;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import tk.mybatis.mapper.entity.Example;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 

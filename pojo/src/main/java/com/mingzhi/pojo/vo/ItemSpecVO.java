@@ -1,6 +1,5 @@
 package com.mingzhi.pojo.vo;
 
-import io.swagger.models.auth.In;
 
 /**
  * 购物车结算VO

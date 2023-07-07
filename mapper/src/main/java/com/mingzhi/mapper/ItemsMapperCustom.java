@@ -21,5 +21,7 @@ public interface ItemsMapperCustom {
 
     public List<ItemSpecVO> queryItemsSpecBySpecIds(@Param("paramsList") List specIdsList);
 
+    public int decreaseItemSpecStock(@Param("specId") String specId, @Param("buyCounts") Integer buyCounts);
+
 
 }

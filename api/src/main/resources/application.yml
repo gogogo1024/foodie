@@ -44,3 +44,13 @@ logging:
   #  level.org.springframework.boot.autoconfigure: error #spring的自动装配日志只打error，否则debug输出的会打印很多自动装配的log信息到控制台
   config: classpath:log4j2.xml
 
+#  springdoc swagger3
+springdoc:
+  swagger-ui:
+    enabled: true
+    layout: BaseLayout
+  api-docs:
+    enabled: true
+  packages-to-scan:
+    com.mingzhi.controller
+

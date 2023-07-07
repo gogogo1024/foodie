@@ -10,7 +10,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 @MapperScan(basePackages = "com.mingzhi.mapper")
 // 扫描所有包以及组件包
 @ComponentScan(basePackages = {"com.mingzhi", "org.n3r.idworker"})
-@SpringBootApplication
+@SpringBootApplication()
 public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
