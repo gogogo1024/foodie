@@ -15,6 +15,7 @@ import java.util.HashMap;
  */
 @Configuration
 public class OpenApiConfig {
+    // TODO springdoc swagger文档目前集成有问题
     @Bean
     public OpenAPI springShopOpenAPI() {
         return new OpenAPI()

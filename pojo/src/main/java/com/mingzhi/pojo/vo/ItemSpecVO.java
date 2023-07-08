@@ -5,9 +5,25 @@ package com.mingzhi.pojo.vo;
  * 购物车结算VO
  */
 public class ItemSpecVO {
-    private String itemSpecId;
     private String itemId;
-    private String itemImgUrl;
+    private String itemImg;
+    private String itemSpecName;
+
+    public String getItemImg() {
+        return itemImg;
+    }
+
+    public void setItemImg(String itemImg) {
+        this.itemImg = itemImg;
+    }
+
+    public String getItemSpecName() {
+        return itemSpecName;
+    }
+
+    public void setItemSpecName(String itemSpecName) {
+        this.itemSpecName = itemSpecName;
+    }
 
     public String getItemSpecId() {
         return itemSpecId;
@@ -17,8 +33,8 @@ public class ItemSpecVO {
         this.itemSpecId = itemSpecId;
     }
 
+    private String itemSpecId;
     private String itemName;
-    private String specId;
 
     public String getItemId() {
         return itemId;
@@ -28,13 +44,6 @@ public class ItemSpecVO {
         this.itemId = itemId;
     }
 
-    public String getItemImgUrl() {
-        return itemImgUrl;
-    }
-
-    public void setItemImgUrl(String itemImgUrl) {
-        this.itemImgUrl = itemImgUrl;
-    }
 
     public String getItemName() {
         return itemName;
@@ -42,22 +51,6 @@ public class ItemSpecVO {
 
     public void setItemName(String itemName) {
         this.itemName = itemName;
-    }
-
-    public String getSpecId() {
-        return specId;
-    }
-
-    public void setSpecId(String specId) {
-        this.specId = specId;
-    }
-
-    public String getSpecName() {
-        return specName;
-    }
-
-    public void setSpecName(String specName) {
-        this.specName = specName;
     }
 
 
@@ -77,7 +70,6 @@ public class ItemSpecVO {
         this.priceNormal = priceNormal;
     }
 
-    private String specName;
     private Integer priceDiscount;
     private Integer priceNormal;
 

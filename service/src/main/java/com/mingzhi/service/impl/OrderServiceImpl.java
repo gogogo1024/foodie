@@ -46,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
      * @param submitOrderBO 订单创建BO
      */
 
-    @Transactional(propagation = Propagation.SUPPORTS)
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void creatOrder(SubmitOrderBO submitOrderBO) {
         String userId = submitOrderBO.getUserId();
@@ -64,6 +64,8 @@ public class OrderServiceImpl implements OrderService {
                 + userAddress.getCity() + " "
                 + userAddress.getDistrict() + " "
                 + userAddress.getDetail() + " ");
+        order.setReceiverName(userAddress.getReceiver());
+        order.setReceiverMobile(userAddress.getMobile());
 
         // TODO 商品购买数量重新从redis中获取
         int buyCounts = 1;
@@ -82,7 +84,6 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItems> list = new ArrayList<>();
 
         for (ItemSpecVO itemSpecVO : itemSpecVOList) {
-            OrderItems oi = new OrderItems();
             totalAmount += itemSpecVO.getPriceNormal() * buyCounts;
             realPayAmount += itemSpecVO.getPriceDiscount() * buyCounts;
             OrderItems orderItems = new OrderItems();
@@ -93,17 +94,18 @@ public class OrderServiceImpl implements OrderService {
 //            orderItems.setItemSpecId(itemSpecVO.getSpecId());
 //            orderItems.setItemSpecName(itemSpecVO.getSpecName());
 
-            // {itemId:buyCounts:itemSpecId} group by itemId sum buyCounts
             String[] ignoreProperties = new String[]{
                     "priceNormal",
-//                    "priceDiscount",
+                    "priceDiscount",
             };
-            BeanUtils.copyProperties(oi, itemSpecVO, ignoreProperties);
+            BeanUtils.copyProperties(itemSpecVO, orderItems, ignoreProperties);
             orderItems.setId(sid.nextShort());
             orderItems.setOrderId(orderId);
+            orderItems.setPrice(itemSpecVO.getPriceDiscount());
+            orderItems.setBuyCounts(buyCounts);
             list.add(orderItems);
             //  减库存
-            itemService.decreaseItemSpecStock(itemSpecVO.getItemId(), buyCounts);
+            itemService.decreaseItemSpecStock(itemSpecVO.getItemSpecId(), buyCounts);
         }
         // 1. 订单详情
         orderItemsMapper.insertList(list);
