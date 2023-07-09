@@ -8,6 +8,9 @@ public class ShopCartVO {
     private String itemImgUrl;
     private String itemName;
     private String specId;
+    private String specName;
+    private Integer priceDiscount;
+    private Integer priceNormal;
 
     public String getItemId() {
         return itemId;
@@ -49,9 +52,12 @@ public class ShopCartVO {
         this.specName = specName;
     }
 
-
     public Integer getPriceDiscount() {
         return priceDiscount;
+    }
+
+    public void setPriceDiscount(Integer priceDiscount) {
+        this.priceDiscount = priceDiscount;
     }
 
     public Integer getPriceNormal() {
@@ -61,14 +67,6 @@ public class ShopCartVO {
     public void setPriceNormal(Integer priceNormal) {
         this.priceNormal = priceNormal;
     }
-
-    public void setPriceDiscount(Integer priceDiscount) {
-        this.priceDiscount = priceDiscount;
-    }
-
-    private String specName;
-    private Integer priceDiscount;
-    private Integer priceNormal;
 
 
 }

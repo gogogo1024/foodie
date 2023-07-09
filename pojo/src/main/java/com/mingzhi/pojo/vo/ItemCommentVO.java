@@ -12,6 +12,7 @@ public class ItemCommentVO {
     private String specName;
     private Date createdTime;
     private String userFace;
+    private String nickname;
 
     public String getUserFace() {
         return userFace;
@@ -20,9 +21,6 @@ public class ItemCommentVO {
     public void setUserFace(String userFace) {
         this.userFace = userFace;
     }
-
-    private String nickname;
-
 
     public Integer getCommentLevel() {
         return commentLevel;

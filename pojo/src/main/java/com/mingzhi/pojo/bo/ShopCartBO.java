@@ -8,6 +8,10 @@ public class ShopCartBO {
     private String itemImgUrl;
     private String itemName;
     private String specId;
+    private String specName;
+    private Integer buyCounts;
+    private String priceDiscount;
+    private String priceNormal;
 
     public String getItemId() {
         return itemId;
@@ -72,11 +76,6 @@ public class ShopCartBO {
     public void setPriceNormal(String priceNormal) {
         this.priceNormal = priceNormal;
     }
-
-    private String specName;
-    private Integer buyCounts;
-    private String priceDiscount;
-    private String priceNormal;
 
     @Override
     public String toString() {

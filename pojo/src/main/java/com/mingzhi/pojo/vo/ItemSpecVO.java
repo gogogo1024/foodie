@@ -8,6 +8,10 @@ public class ItemSpecVO {
     private String itemId;
     private String itemImg;
     private String itemSpecName;
+    private String itemSpecId;
+    private String itemName;
+    private Integer priceDiscount;
+    private Integer priceNormal;
 
     public String getItemImg() {
         return itemImg;
@@ -33,9 +37,6 @@ public class ItemSpecVO {
         this.itemSpecId = itemSpecId;
     }
 
-    private String itemSpecId;
-    private String itemName;
-
     public String getItemId() {
         return itemId;
     }
@@ -44,7 +45,6 @@ public class ItemSpecVO {
         this.itemId = itemId;
     }
 
-
     public String getItemName() {
         return itemName;
     }
@@ -52,7 +52,6 @@ public class ItemSpecVO {
     public void setItemName(String itemName) {
         this.itemName = itemName;
     }
-
 
     public Integer getPriceDiscount() {
         return priceDiscount;
@@ -69,9 +68,6 @@ public class ItemSpecVO {
     public void setPriceNormal(Integer priceNormal) {
         this.priceNormal = priceNormal;
     }
-
-    private Integer priceDiscount;
-    private Integer priceNormal;
 
 
 }

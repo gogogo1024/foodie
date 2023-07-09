@@ -1,6 +1,7 @@
 package com.mingzhi.pojo;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Id;
 import java.util.Date;
 
 public class ItemsComments {

@@ -1,6 +1,5 @@
 package com.mingzhi.service;
 
-import com.mingzhi.pojo.Carousel;
 import com.mingzhi.pojo.UserAddress;
 import com.mingzhi.pojo.bo.AddressBO;
 

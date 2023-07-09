@@ -9,6 +9,9 @@ public class AddressBO {
     private String receiver;
     private String mobile;
     private String province;
+    private String city;
+    private String district;
+    private String detail;
 
     public String getAddressId() {
         return addressId;
@@ -73,9 +76,5 @@ public class AddressBO {
     public void setDetail(String detail) {
         this.detail = detail;
     }
-
-    private String city;
-    private String district;
-    private String detail;
 
 }

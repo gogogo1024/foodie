@@ -1,10 +1,6 @@
 package com.mingzhi.service;
 
-import com.mingzhi.pojo.Carousel;
-import com.mingzhi.pojo.Orders;
 import com.mingzhi.pojo.bo.SubmitOrderBO;
-
-import java.util.List;
 
 public interface OrderService {
     /**
@@ -12,6 +8,14 @@ public interface OrderService {
      *
      * @param submitOrderBO 订单创建BO
      */
-    public void creatOrder(SubmitOrderBO submitOrderBO);
+    public String creatOrder(SubmitOrderBO submitOrderBO);
+
+    /**
+     * 修改订单状态
+     *
+     * @param orderId     订单id
+     * @param orderStatus 订单状态
+     */
+    public void updateOrderStatus(String orderId, Integer orderStatus);
 
 }

@@ -5,7 +5,6 @@ import com.mingzhi.pojo.ItemsImg;
 import com.mingzhi.pojo.ItemsParam;
 import com.mingzhi.pojo.ItemsSpec;
 import com.mingzhi.pojo.vo.CommentLevelCountsVO;
-import com.mingzhi.pojo.vo.ItemCommentVO;
 import com.mingzhi.pojo.vo.ItemSpecVO;
 import com.mingzhi.pojo.vo.ShopCartVO;
 import com.mingzhi.utils.PagedGridResult;
