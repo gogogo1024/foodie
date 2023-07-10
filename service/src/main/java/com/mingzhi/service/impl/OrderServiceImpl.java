@@ -11,6 +11,8 @@ import com.mingzhi.pojo.Orders;
 import com.mingzhi.pojo.UserAddress;
 import com.mingzhi.pojo.bo.SubmitOrderBO;
 import com.mingzhi.pojo.vo.ItemSpecVO;
+import com.mingzhi.pojo.vo.MerchantOrderVO;
+import com.mingzhi.pojo.vo.OrderVO;
 import com.mingzhi.service.AddressService;
 import com.mingzhi.service.ItemService;
 import com.mingzhi.service.OrderService;
@@ -48,13 +50,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public String creatOrder(SubmitOrderBO submitOrderBO) {
+    public OrderVO creatOrder(SubmitOrderBO submitOrderBO) {
         String userId = submitOrderBO.getUserId();
         String addressId = submitOrderBO.getAddressId();
         String itemSectIds = submitOrderBO.getItemSpecIds();
         Integer payMethod = submitOrderBO.getPayMethod();
         String leftMsg = submitOrderBO.getLeftMsg();
-        Integer postAmount = 0;
+        int postAmount = 0;
         Orders order = new Orders();
         String orderId = sid.nextShort();
         order.setId(orderId);
@@ -87,13 +89,6 @@ public class OrderServiceImpl implements OrderService {
             totalAmount += itemSpecVO.getPriceNormal() * buyCounts;
             realPayAmount += itemSpecVO.getPriceDiscount() * buyCounts;
             OrderItems orderItems = new OrderItems();
-//            orderItems.setItemId(itemSpecVO.getItemId());
-//            orderItems.setItemName(itemSpecVO.getItemName());
-//            orderItems.setItemImg(itemSpecVO.getItemImgUrl());
-//            orderItems.setBuyCounts(buyCounts);
-//            orderItems.setItemSpecId(itemSpecVO.getSpecId());
-//            orderItems.setItemSpecName(itemSpecVO.getSpecName());
-
             String[] ignoreProperties = new String[]{
                     "priceNormal",
                     "priceDiscount",
@@ -123,7 +118,19 @@ public class OrderServiceImpl implements OrderService {
         currentDate = new Date();
         orderStatus.setCreatedTime(currentDate);
         orderStatusMapper.insert(orderStatus);
-        return orderId;
+
+        // 4. 构建商户订单
+        MerchantOrderVO merchantOrderVO = new MerchantOrderVO();
+        merchantOrderVO.setMerchantOrderId(orderId);
+        merchantOrderVO.setMerchantUserId(userId);
+        merchantOrderVO.setAmount(postAmount + realPayAmount);
+        merchantOrderVO.setPayMethod(payMethod);
+//        merchantOrderVO.setReturnUrl("");
+        // 5. 构建自定义订单
+        OrderVO orderVO = new OrderVO();
+        orderVO.setOrderId(orderId);
+        orderVO.setMerchantOrderVO(merchantOrderVO);
+        return orderVO;
     }
 
     /**
