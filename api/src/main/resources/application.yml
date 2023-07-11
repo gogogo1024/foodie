@@ -53,4 +53,14 @@ springdoc:
     enabled: true
   packages-to-scan:
     com.mingzhi.controller
+# wechatpay sdk 配置
+wechatpay:
+  appId: "appId"
+  merchantId: "merchantId"
+  privateKeyPath: "privateKeyPath"
+  merchantSerialNumber: "merchantSerialNumber"
+  apiV3key: "apiV3key"
+  notifyUrl: "https://123.com/orders/notifyWechatPaid"
+
+
 

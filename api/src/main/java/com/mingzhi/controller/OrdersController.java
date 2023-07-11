@@ -8,6 +8,11 @@ import com.mingzhi.pojo.vo.OrderVO;
 import com.mingzhi.service.AddressService;
 import com.mingzhi.service.OrderService;
 import com.mingzhi.utils.MingzhiJSONResult;
+import com.wechat.pay.java.core.RSAAutoCertificateConfig;
+import com.wechat.pay.java.core.notification.NotificationConfig;
+import com.wechat.pay.java.core.notification.NotificationParser;
+import com.wechat.pay.java.core.notification.RequestParam.Builder;
+import com.wechat.pay.java.service.payments.model.Transaction;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,26 +27,26 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
 
+
 @Tag(name = "订单接口", description = "订单接口")
 @RestController()
 @ResponseBody()
 @RequestMapping("orders")
 public class OrdersController {
     final static Logger logger = LoggerFactory.getLogger(OrdersController.class);
+    public static String notifyUrl = "https://localhost:8088/orders/notifyWechatPaid";
     @Autowired
     private AddressService addressService;
     @Autowired
     private RestTemplate restTemplate;
-
     @Autowired
     private OrderService orderService;
-
-    public static String notifyUrl = "https://123.com/orders/notifyWechatPaid";
+    private com.wechat.pay.java.core.notification.RequestParam WechatRequest;
 
 
     @Operation(summary = "用户提交订单", description = "用户提交订单", method = "POST")
     @PostMapping("/create")
-    public MingzhiJSONResult queryAll(
+    public MingzhiJSONResult create(
             @Parameter(name = "submitOrderBO", description = "提交订单BO", required = true)
             @RequestBody SubmitOrderBO submitOrderBO,
             HttpServletRequest request,
@@ -66,7 +71,7 @@ public class OrdersController {
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<MerchantOrderVO> entity = new HttpEntity<>(merchantOrderVO, httpHeaders);
         ResponseEntity<MingzhiJSONResult> responseEntity = restTemplate.postForEntity(
-                "http://localhost:8088/payment/createMerchantOrder",
+                "http://127.0.0.1:8088/payment/createMerchantOrder",
                 entity,
                 MingzhiJSONResult.class
         );
@@ -84,16 +89,32 @@ public class OrdersController {
             @Parameter(name = "orderId", description = "订单id", required = true)
             @RequestParam String orderId) {
 
+        // 构造 RequestParam
+        com.wechat.pay.java.core.notification.RequestParam requestParam = new Builder()
+                .serialNumber("wechatPayCertificateSerialNumber")
+                .nonce("nonce")
+                .signature("signature")
+                .timestamp("timestamp")
+                .body("requestBody")
+                .build();
+
+/// 如果已经初始化了 RSAAutoCertificateConfig，可直接使用
+/// 没有的话，则构造一个
+        NotificationConfig config = new RSAAutoCertificateConfig.Builder()
+                .merchantId("merchantId")
+                .privateKeyFromPath("privateKeyPath")
+                .merchantSerialNumber("merchantSerialNumber")
+                .apiV3Key("apiV3key")
+                .build();
+
+/// 初始化 NotificationParser
+        NotificationParser parser = new NotificationParser(config);
+
+/// 以支付通知回调为例，验签、解密并转换成 Transaction
+        Transaction transaction = parser.parse(requestParam, Transaction.class);
+
         orderService.updateOrderStatus(orderId, OrderStatusEnum.WAIT_DELIVER.type);
         return HttpStatus.OK.value();
-        // 订单创建
-//        String orderId = orderService.creatOrder(submitOrderBO);
-//
-//        // 移除购物车中已结算商品
-//        // TODO redis中移除购物车中已结算商品
-////        CookieUtils.setCookie(request, response, "shopcart", "", true);
-//
-//
-//        // 调用支付中心，保存支付中心订单
     }
+
 }

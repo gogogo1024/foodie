@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 微信支付clearq:q
+ * 微信支付
  */
 @Service
 public class WechatPayServiceImpl implements WechatPayService {
@@ -41,6 +41,48 @@ public class WechatPayServiceImpl implements WechatPayService {
     public static String wechatPayCertificatePath = "";
 
     public static NativePayService service;
+
+    /**
+     * Native支付预下单
+     */
+    public static PrepayResponse prepay(WeChatPayBO weChatPayBO) {
+        PrepayRequest request = new PrepayRequest();
+        Amount amount = new Amount();
+        amount.setTotal(weChatPayBO.getTotal());
+        request.setAmount(amount);
+        request.setAppid(appId);
+        request.setMchid(merchantId);
+        request.setDescription(weChatPayBO.getDescription());
+        request.setNotifyUrl(notifyUrl);
+        request.setOutTradeNo(weChatPayBO.getOutTradeNo());
+        return service.prepay(request);
+    }
+
+    /**
+     * 关闭订单
+     */
+    public static void closeOrder() {
+        CloseOrderRequest request = new CloseOrderRequest();
+        service.closeOrder(request);
+    }
+
+    /**
+     * 微信支付订单号查询订单
+     */
+    public static Transaction queryOrderById() {
+
+        QueryOrderByIdRequest request = new QueryOrderByIdRequest();
+        return service.queryOrderById(request);
+    }
+
+    /**
+     * 商户订单号查询订单
+     */
+    public static Transaction queryOrderByOutTradeNo() {
+
+        QueryOrderByOutTradeNoRequest request = new QueryOrderByOutTradeNoRequest();
+        return service.queryOrderByOutTradeNo(request);
+    }
 
     /**
      * 获取微信Native支付二维码url
@@ -75,49 +117,6 @@ public class WechatPayServiceImpl implements WechatPayService {
             // 调用e.getMessage()获取信息打印日志或上报监控，更多方法见MalformedMessageException定义
         }
         return codeUrl;
-    }
-
-
-    /**
-     * Native支付预下单
-     */
-    public static PrepayResponse prepay(WeChatPayBO weChatPayBO) {
-        PrepayRequest request = new PrepayRequest();
-        Amount amount = new Amount();
-        amount.setTotal(weChatPayBO.getTotal());
-        request.setAmount(amount);
-        request.setAppid(weChatPayBO.getAppId());
-        request.setMchid(weChatPayBO.getMchid());
-        request.setDescription(weChatPayBO.getDescription());
-        request.setNotifyUrl(notifyUrl);
-        request.setOutTradeNo(weChatPayBO.getOutTradeNo());
-        return service.prepay(request);
-    }
-
-    /**
-     * 关闭订单
-     */
-    public static void closeOrder() {
-        CloseOrderRequest request = new CloseOrderRequest();
-        service.closeOrder(request);
-    }
-
-    /**
-     * 微信支付订单号查询订单
-     */
-    public static Transaction queryOrderById() {
-
-        QueryOrderByIdRequest request = new QueryOrderByIdRequest();
-        return service.queryOrderById(request);
-    }
-
-    /**
-     * 商户订单号查询订单
-     */
-    public static Transaction queryOrderByOutTradeNo() {
-
-        QueryOrderByOutTradeNoRequest request = new QueryOrderByOutTradeNoRequest();
-        return service.queryOrderByOutTradeNo(request);
     }
 
 }

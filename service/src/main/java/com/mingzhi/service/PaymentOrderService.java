@@ -2,6 +2,8 @@ package com.mingzhi.service;
 
 import com.mingzhi.pojo.PaymentOrders;
 import com.mingzhi.pojo.vo.MerchantOrderVO;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface PaymentOrderService {
 
@@ -17,8 +19,10 @@ public interface PaymentOrderService {
     /**
      * @param merchantOrderId 商户id
      * @param merchantUserId  用户id
-     * @param orderStatus     订单状态
+     * @param paymentStatus   支付订单状态
      * @return 商户支付订单
      */
-    public PaymentOrders queryOrderByStatus(String merchantOrderId, String merchantUserId, Integer orderStatus);
+    public PaymentOrders queryOrderByStatus(String merchantOrderId, String merchantUserId, Integer paymentStatus);
+
+    public void notifyWechatPaid(HttpServletRequest request, HttpServletResponse response);
 }

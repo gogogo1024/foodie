@@ -1,7 +1,7 @@
 package com.mingzhi.controller;
 
-import com.mingzhi.enums.OrderStatusEnum;
 import com.mingzhi.enums.PayMethod;
+import com.mingzhi.enums.PayStatusEnum;
 import com.mingzhi.pojo.PaymentOrders;
 import com.mingzhi.pojo.bo.WeChatPayBO;
 import com.mingzhi.pojo.vo.MerchantOrderVO;
@@ -17,9 +17,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "支付接口", description = "支付接口")
+@Tag(name = "支付中心接口", description = "支付中心接口")
 @RestController()
 @ResponseBody()
 @RequestMapping("payment")
@@ -36,9 +37,12 @@ public class PaymentController {
     @Autowired
     private WechatPayService wechatPayService;
 
+    @Autowired
+    private Environment env;
+
     @Operation(summary = "创建商户订单", description = "创建商户订单", method = "POST")
     @PostMapping("/createMerchantOrder")
-    public MingzhiJSONResult queryAll(
+    public MingzhiJSONResult createMerchantOrder(
             @RequestBody MerchantOrderVO merchantOrderVO
     ) {
         String merchantOrderId = merchantOrderVO.getMerchantOrderId();
@@ -66,6 +70,8 @@ public class PaymentController {
             return MingzhiJSONResult.errorMsg("参数[returnUrl]不能为空");
         }
 
+        String ss = env.getProperty("wechatpay.appId");
+        System.out.println(ss);
         // 保存传来的商户订单信息
         boolean isSuccess = false;
         try {
@@ -87,13 +93,16 @@ public class PaymentController {
     public MingzhiJSONResult getWXPayQRCode(
             String merchantOrderId, String merchantUserId
     ) {
-        PaymentOrders waitPayOrder = paymentOrderService.queryOrderByStatus(merchantUserId, merchantOrderId, OrderStatusEnum.WAIT_PAY.type);
+        PaymentOrders waitPayOrder = paymentOrderService.queryOrderByStatus(merchantOrderId, merchantUserId, PayStatusEnum.UNPAID.type);
 
         // 商品描述
         String description = "天天吃货-付款用户[" + merchantUserId + "]";
         // 商户订单号
         // 从redis中去获得这笔订单的微信支付二维码，如果订单状态没有支付没有就放入，这样的做法防止用户频繁刷新而调用微信接口
+        // redis设置超时时间小于微信支付链接的有效时间（2小时）
         if (waitPayOrder != null) {
+            // TODO redis获取waitPayOrder订单对应的支付二维码链接，
+            //  如果存在直接组装,不存在时向微信发起支付请求获取二维码链接
 
             // 订单总金额，单位为分
             // 测试用 1分钱
