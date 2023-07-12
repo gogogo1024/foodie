@@ -16,6 +16,7 @@ import com.mingzhi.pojo.vo.OrderVO;
 import com.mingzhi.service.AddressService;
 import com.mingzhi.service.ItemService;
 import com.mingzhi.service.OrderService;
+import com.mingzhi.utils.DateUtil;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,6 +148,41 @@ public class OrderServiceImpl implements OrderService {
         status.setOrderStatus(orderStatus);
         status.setPayTime(new Date());
         orderStatusMapper.updateByPrimaryKeySelective(status);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public OrderStatus queryOrderInfo(String orderId) {
+        return orderStatusMapper.selectByPrimaryKey(orderId);
+    }
+
+    /**
+     * 关闭超时未支付订单
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void closeOrder() {
+        // 查询超时的未付款订单
+        OrderStatus orderStatus = new OrderStatus();
+        orderStatus.setOrderStatus(OrderStatusEnum.WAIT_PAY.type);
+        List<OrderStatus> list = orderStatusMapper.select(orderStatus);
+        for (OrderStatus os : list) {
+            Date createdTime = os.getCreatedTime();
+            int diffDay = DateUtil.daysBetween(createdTime, new Date());
+            if (diffDay >= 1) {
+                doCloseOrder(os.getOrderId());
+            }
+        }
+
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void doCloseOrder(String orderId) {
+        OrderStatus orderStatus = new OrderStatus();
+        orderStatus.setOrderId(orderId);
+        orderStatus.setOrderStatus(OrderStatusEnum.CLOSE.type);
+        orderStatus.setCloseTime(new Date());
+        orderStatusMapper.updateByPrimaryKeySelective(orderStatus);
     }
 
 }

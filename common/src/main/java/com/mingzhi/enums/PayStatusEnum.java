@@ -5,7 +5,7 @@ package com.mingzhi.enums;
  */
 public enum PayStatusEnum {
     UNPAID(10, " 未支付"),
-    Paid(20, "已支付"),
+    PAID(20, "已支付"),
     PAYMENT_FAILED(30, "支付失败"),
     REFUNDED(40, "已退款");
 

@@ -10,15 +10,25 @@ import com.mingzhi.service.AddressService;
 import com.mingzhi.service.OrderService;
 import com.mingzhi.service.PaymentOrderService;
 import com.mingzhi.service.WechatPayService;
+import com.mingzhi.utils.DateUtil;
 import com.mingzhi.utils.MingzhiJSONResult;
+import com.wechat.pay.java.core.RSAAutoCertificateConfig;
+import com.wechat.pay.java.core.notification.NotificationConfig;
+import com.wechat.pay.java.core.notification.NotificationParser;
+import com.wechat.pay.java.service.payments.model.Transaction;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 @Tag(name = "支付中心接口", description = "支付中心接口")
 @RestController()
@@ -39,6 +49,8 @@ public class PaymentController {
 
     @Autowired
     private Environment env;
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Operation(summary = "创建商户订单", description = "创建商户订单", method = "POST")
     @PostMapping("/createMerchantOrder")
@@ -88,7 +100,7 @@ public class PaymentController {
         }
     }
 
-    @Operation(summary = " 微信扫码支付", description = "微信扫码支付", method = "POST")
+    @Operation(summary = "微信扫码支付", description = "微信扫码支付", method = "POST")
     @PostMapping("/getWXPayQRCode")
     public MingzhiJSONResult getWXPayQRCode(
             String merchantOrderId, String merchantUserId
@@ -126,4 +138,50 @@ public class PaymentController {
         }
     }
 
+    @Operation(summary = "微信支付回调通知", description = "微信支付回调通知", method = "POST")
+    @PostMapping("/notifyWechatPaid")
+    public Integer notifyMerchantOrder(
+            @Parameter(name = "orderId", description = "订单id", required = true)
+            @RequestParam String orderId) {
+
+        // 构造 RequestParam
+        com.wechat.pay.java.core.notification.RequestParam requestParam = new com.wechat.pay.java.core.notification.RequestParam.Builder()
+                .serialNumber("wechatPayCertificateSerialNumber")
+                .nonce("nonce")
+                .signature("signature")
+                .timestamp("timestamp")
+                .body("requestBody")
+                .build();
+
+/// 如果已经初始化了 RSAAutoCertificateConfig，可直接使用
+/// 没有的话，则构造一个
+        NotificationConfig config = new RSAAutoCertificateConfig.Builder()
+                .merchantId("merchantId")
+                .privateKeyFromPath("privateKeyPath")
+                .merchantSerialNumber("merchantSerialNumber")
+                .apiV3Key("apiV3key")
+                .build();
+
+/// 初始化 NotificationParser
+        NotificationParser parser = new NotificationParser(config);
+
+/// 以支付通知回调为例，验签、解密并转换成 Transaction,transaction中包含了merchantOrderId,paidAmount
+        // 解析transaction 查看是否支付，如果已支付直接处理，未支付则报错，并且返回给微信支付失败
+        Transaction transaction = parser.parse(requestParam, Transaction.class);
+
+
+        String merchantReturnUrl = paymentOrderService.updatePaymentOrderPaid("merchantOrderId", 1);
+        logger.info("************* 支付成功(微信支付异步通知) - 时间: {} *************", DateUtil.getCurrentDateString(DateUtil.DATETIME_PATTERN));
+        logger.info("* 商户订单号: {}", "merchantOrderId");
+        logger.info("* 微信订单号: {}", "wxFlowId");
+        logger.info("* 实际支付金额: {}", "paidAmount");
+        logger.info("*****************************************************************************");
+        // 通知电商主体服务端订单已支付
+        MultiValueMap<String, String> requestEntity = new LinkedMultiValueMap<>();
+        requestEntity.add("merchantOrderId", "merchantOrderId");
+        String httpStatus = restTemplate.postForObject(merchantReturnUrl, requestEntity, String.class);
+        logger.info("*** 通知电商主体服务端后返回的状态码 httpStatus: {} ***", httpStatus);
+        // TODO 通知微信支付中心，已经收到回调通知，不要再发消息来了
+        return HttpStatus.OK.value();
+    }
 }

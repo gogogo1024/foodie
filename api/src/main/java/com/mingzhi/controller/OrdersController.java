@@ -2,17 +2,13 @@ package com.mingzhi.controller;
 
 import com.mingzhi.enums.OrderStatusEnum;
 import com.mingzhi.enums.PayMethod;
+import com.mingzhi.pojo.OrderStatus;
 import com.mingzhi.pojo.bo.SubmitOrderBO;
 import com.mingzhi.pojo.vo.MerchantOrderVO;
 import com.mingzhi.pojo.vo.OrderVO;
 import com.mingzhi.service.AddressService;
 import com.mingzhi.service.OrderService;
 import com.mingzhi.utils.MingzhiJSONResult;
-import com.wechat.pay.java.core.RSAAutoCertificateConfig;
-import com.wechat.pay.java.core.notification.NotificationConfig;
-import com.wechat.pay.java.core.notification.NotificationParser;
-import com.wechat.pay.java.core.notification.RequestParam.Builder;
-import com.wechat.pay.java.service.payments.model.Transaction;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,7 +30,7 @@ import java.util.Objects;
 @RequestMapping("orders")
 public class OrdersController {
     final static Logger logger = LoggerFactory.getLogger(OrdersController.class);
-    public static String notifyUrl = "https://localhost:8088/orders/notifyWechatPaid";
+    public static String returnUrl = "https://localhost:8088/orders/notifyMerchantOrderPaid";
     @Autowired
     private AddressService addressService;
     @Autowired
@@ -58,7 +54,7 @@ public class OrdersController {
         OrderVO orderVO = orderService.creatOrder(submitOrderBO);
         String orderId = orderVO.getOrderId();
         MerchantOrderVO merchantOrderVO = orderVO.getMerchantOrderVO();
-        merchantOrderVO.setReturnUrl(notifyUrl);
+        merchantOrderVO.setReturnUrl(returnUrl);
         // 目前都为1分钱暂时
         merchantOrderVO.setAmount(1);
         // 移除购物车中已结算商品
@@ -83,38 +79,17 @@ public class OrdersController {
         return MingzhiJSONResult.ok(orderId);
     }
 
-    @Operation(summary = "微信支付回调通知", description = "微信支付回调通知", method = "POST")
-    @PostMapping("/notifyWechatPaid")
-    public Integer notifyMerchantOrder(
-            @Parameter(name = "orderId", description = "订单id", required = true)
-            @RequestParam String orderId) {
-
-        // 构造 RequestParam
-        com.wechat.pay.java.core.notification.RequestParam requestParam = new Builder()
-                .serialNumber("wechatPayCertificateSerialNumber")
-                .nonce("nonce")
-                .signature("signature")
-                .timestamp("timestamp")
-                .body("requestBody")
-                .build();
-
-/// 如果已经初始化了 RSAAutoCertificateConfig，可直接使用
-/// 没有的话，则构造一个
-        NotificationConfig config = new RSAAutoCertificateConfig.Builder()
-                .merchantId("merchantId")
-                .privateKeyFromPath("privateKeyPath")
-                .merchantSerialNumber("merchantSerialNumber")
-                .apiV3Key("apiV3key")
-                .build();
-
-/// 初始化 NotificationParser
-        NotificationParser parser = new NotificationParser(config);
-
-/// 以支付通知回调为例，验签、解密并转换成 Transaction
-        Transaction transaction = parser.parse(requestParam, Transaction.class);
-
-        orderService.updateOrderStatus(orderId, OrderStatusEnum.WAIT_DELIVER.type);
+    @Operation(summary = "支付中心通知电商主体服务端订单已支付", description = "支付中心通知电商主体服务端订单已支付", method = "POST")
+    @PostMapping("notifyMerchantOrderPaid")
+    public Integer notifyMerchantOrderPaid(String merchantOrderId) {
+        orderService.updateOrderStatus(merchantOrderId, OrderStatusEnum.WAIT_DELIVER.type);
         return HttpStatus.OK.value();
     }
 
+    @Operation(summary = "获取订单信息", description = "获取订单信息", method = "POST")
+    @PostMapping("getPaidOrderInfo")
+    public MingzhiJSONResult getPaidOrderInfo(String orderId) {
+        OrderStatus orderStatus = orderService.queryOrderInfo(orderId);
+        return MingzhiJSONResult.ok(orderStatus);
+    }
 }

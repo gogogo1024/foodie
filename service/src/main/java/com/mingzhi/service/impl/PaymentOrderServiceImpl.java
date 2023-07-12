@@ -6,20 +6,13 @@ import com.mingzhi.mapper.PaymentOrderMapper;
 import com.mingzhi.pojo.PaymentOrders;
 import com.mingzhi.pojo.vo.MerchantOrderVO;
 import com.mingzhi.service.PaymentOrderService;
-import com.wechat.pay.java.core.RSAAutoCertificateConfig;
-import com.wechat.pay.java.core.notification.NotificationConfig;
-import com.wechat.pay.java.core.notification.NotificationParser;
-import com.wechat.pay.java.service.payments.model.Transaction;
-import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.Date;
 
@@ -63,42 +56,54 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
         return paymentOrderMapper.selectOne(queryOrder);
     }
 
-    @Operation(summary = "微信支付回调通知", description = "微信支付回调通知", method = "POST")
-    @PostMapping("/notifyWechatPaid")
-    public void notifyWechatPaid(
-            HttpServletRequest request, HttpServletResponse response) {
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public String updatePaymentOrderPaid(
+            String merchantOrderId, Integer paidAmount) {
 
-        // 构造 RequestParam
-        com.wechat.pay.java.core.notification.RequestParam requestParam = new com.wechat.pay.java.core.notification.RequestParam.Builder()
-                .serialNumber("wechatPayCertificateSerialNumber")
-                .nonce("nonce")
-                .signature("signature")
-                .timestamp("timestamp")
-                .body("requestBody")
-                .build();
+//        // 构造 RequestParam
+//        com.wechat.pay.java.core.notification.RequestParam requestParam = new com.wechat.pay.java.core.notification.RequestParam.Builder()
+//                .serialNumber("wechatPayCertificateSerialNumber")
+//                .nonce("nonce")
+//                .signature("signature")
+//                .timestamp("timestamp")
+//                .body("requestBody")
+//                .build();
+//
+//// 如果已经初始化了 RSAAutoCertificateConfig，可直接使用
+//// 没有的话，则构造一个
+//        NotificationConfig config = new RSAAutoCertificateConfig.Builder()
+//                .merchantId("merchantId")
+//                .privateKeyFromPath("privateKeyPath")
+//                .merchantSerialNumber("merchantSerialNumber")
+//                .apiV3Key("apiV3key")
+//                .build();
+//
+//// 初始化 NotificationParser
+//        NotificationParser parser = new NotificationParser(config);
+//
+//// 以支付通知回调为例，验签、解密并转换成 Transaction
+//        Transaction transaction = parser.parse(requestParam, Transaction.class);
 
-// 如果已经初始化了 RSAAutoCertificateConfig，可直接使用
-// 没有的话，则构造一个
-        NotificationConfig config = new RSAAutoCertificateConfig.Builder()
-                .merchantId("merchantId")
-                .privateKeyFromPath("privateKeyPath")
-                .merchantSerialNumber("merchantSerialNumber")
-                .apiV3Key("apiV3key")
-                .build();
-
-// 初始化 NotificationParser
-        NotificationParser parser = new NotificationParser(config);
-
-// 以支付通知回调为例，验签、解密并转换成 Transaction
-        Transaction transaction = parser.parse(requestParam, Transaction.class);
+        Example example = new Example(PaymentOrders.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("merchantOrderId", "orderId");
 
         PaymentOrders paymentOrders = new PaymentOrders();
-        paymentOrders.setId("orderId");
-        Date currentDate = new Date();
+        paymentOrders.setPayStatus(PayStatusEnum.PAID.type);
+        paymentOrders.setAmount(1);
         // 选择性更新
-        paymentOrderMapper.updateByPrimaryKeySelective(paymentOrders);
+        paymentOrderMapper.updateByExampleSelective(paymentOrders, example);
+        return queryMerchantReturnUrl(merchantOrderId);
+    }
 
-//        orderService.updateOrderStatus(orderId, OrderStatusEnum.WAIT_DELIVER.type);
-//        return HttpStatus.OK.value();
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public String queryMerchantReturnUrl(String merchantOrderId) {
+
+        PaymentOrders paymentOrders = new PaymentOrders();
+        paymentOrders.setMerchantOrderId(merchantOrderId);
+        PaymentOrders order = paymentOrderMapper.selectOne(paymentOrders);
+
+        return paymentOrders.getReturnUrl();
     }
 }
