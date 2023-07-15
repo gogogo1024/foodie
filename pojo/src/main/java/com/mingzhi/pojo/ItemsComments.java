@@ -159,7 +159,7 @@ public class ItemsComments {
      *
      * @return spec_name - 规格名称 可为空
      */
-    public String getSepcName() {
+    public String getSpecName() {
         return specName;
     }
 
@@ -168,7 +168,7 @@ public class ItemsComments {
      *
      * @param specName 规格名称 可为空
      */
-    public void setSepcName(String specName) {
+    public void setSpecName(String specName) {
         this.specName = specName;
     }
 

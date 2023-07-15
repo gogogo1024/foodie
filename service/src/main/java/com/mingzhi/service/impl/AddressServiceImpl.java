@@ -107,16 +107,16 @@ public class AddressServiceImpl implements AddressService {
         UserAddress queryUserAddress = new UserAddress();
         queryUserAddress.setId(addressId);
         queryUserAddress.setUserId(userId);
-        queryUserAddress.setIsDefault(YesOrNo.Yes.type);
+        queryUserAddress.setIsDefault(YesOrNo.YES.type);
         UserAddress ua = userAddressMapper.selectOne(queryUserAddress);
         if (ua == null) {
             // 1. 查询之前默认地址修改为非默认
             UserAddress queryUserAddress2 = new UserAddress();
             queryUserAddress2.setUserId(userId);
-            queryUserAddress2.setIsDefault(YesOrNo.Yes.type);
+            queryUserAddress2.setIsDefault(YesOrNo.YES.type);
             UserAddress preDefaultUser = userAddressMapper.selectOne(queryUserAddress2);
             if (preDefaultUser != null) {
-                preDefaultUser.setIsDefault(YesOrNo.No.type);
+                preDefaultUser.setIsDefault(YesOrNo.NO.type);
                 userAddressMapper.updateByPrimaryKeySelective(preDefaultUser);
             }
 

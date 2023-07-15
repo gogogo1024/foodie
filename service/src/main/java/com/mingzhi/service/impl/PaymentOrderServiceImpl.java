@@ -33,7 +33,7 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
 
         paymentOrder.setId(id);
         paymentOrder.setPayStatus(PayStatusEnum.UNPAID.type);
-        paymentOrder.setIsDelete(YesOrNo.No.type);
+        paymentOrder.setIsDelete(YesOrNo.NO.type);
         paymentOrder.setCreatedTime(new Date());
 
         int result = paymentOrderMapper.insert(paymentOrder);

@@ -22,6 +22,10 @@ spring:
       pool-name: DateSourceHikariCP   # 连接池名字
       max-lifetime: 1800000           # 连接的生命时长（毫秒），超时而且没被使用则被释放（retired），默认:30分钟 1800000ms
       connection-test-query: SELECT 1
+  servlet:
+    multipart:
+      max-file-size: 5KB
+      max-request-size: 5KB
 
 # mybatis设置
 mybatis:
@@ -49,6 +53,7 @@ springdoc:
   swagger-ui:
     enabled: true
     layout: BaseLayout
+    path: /swagger-ui.html
   api-docs:
     enabled: true
   packages-to-scan:
@@ -60,7 +65,9 @@ wechatpay:
   privateKeyPath: "privateKeyPath"
   merchantSerialNumber: "merchantSerialNumber"
   apiV3key: "apiV3key"
-  notifyUrl: "https://123.com/orders/notifyWechatPaid"
-
+  notifyUrl: "https://localhost:8088/orders/notifyWechatPaid"
+# 一些基本配置
+baseCfg:
+  fileUploadUrl: "uploadImg/userFace"
 
 

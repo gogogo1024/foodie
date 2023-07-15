@@ -69,8 +69,8 @@ public class ItemsController {
     public MingzhiJSONResult comment(
             @Parameter(name = "itemId", required = true)
             @RequestParam String itemId,
-            @Parameter(name = "commentLevel", required = false, example = "1")
-            @RequestParam Integer commentLevel,
+            @Parameter(name = "commentLevel", example = "1")
+            @RequestParam(required = false) Integer commentLevel,
             @Parameter(name = "page", required = false, example = "1")
             @RequestParam Integer page,
             @Parameter(name = "pageSize", required = false, example = "10")

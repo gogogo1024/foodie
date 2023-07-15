@@ -15,6 +15,17 @@ public class PagedGridResult {
     private long records;        // 总记录数
     private List<?> rows;        // 每行显示的内容
 
+    public static PagedGridResult setterPagedGrid(List<?> list, Integer page) {
+        PageInfo<?> pageList = new PageInfo<>(list);
+        PagedGridResult pagedGridResult = new PagedGridResult();
+        pagedGridResult.setPage(page);
+        pagedGridResult.setRows(list);
+        pagedGridResult.setTotal(pageList.getPages());
+        pagedGridResult.setRecords(pageList.getTotal());
+        return pagedGridResult;
+
+    }
+
     public int getPage() {
         return page;
     }
@@ -45,16 +56,5 @@ public class PagedGridResult {
 
     public void setRows(List<?> rows) {
         this.rows = rows;
-    }
-
-    public PagedGridResult setterPagedGrid(List<?> list, Integer page) {
-        PageInfo<?> pageList = new PageInfo<>(list);
-        PagedGridResult pagedGridResult = new PagedGridResult();
-        pagedGridResult.setPage(page);
-        pagedGridResult.setRows(list);
-        pagedGridResult.setTotal(pageList.getPages());
-        pagedGridResult.setRecords(pageList.getTotal());
-        return pagedGridResult;
-
     }
 }

@@ -75,8 +75,8 @@ public class OrderServiceImpl implements OrderService {
         order.setPostAmount(postAmount);
         order.setPayMethod(payMethod);
         order.setLeftMsg(leftMsg);
-        order.setIsComment(YesOrNo.No.type);
-        order.setIsDelete(YesOrNo.No.type);
+        order.setIsComment(YesOrNo.NO.type);
+        order.setIsDelete(YesOrNo.NO.type);
         Date currentDate = new Date();
         order.setCreatedTime(currentDate);
         order.setUpdatedTime(currentDate);

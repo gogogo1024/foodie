@@ -34,7 +34,7 @@ public class IndexController {
     @Operation(summary = "获取首页轮播图列表", description = "获取首页轮播图列表", method = "GET")
     @GetMapping("/carousel")
     public MingzhiJSONResult carousel() {
-        List<Carousel> list = carouselService.queryAll(YesOrNo.Yes.type);
+        List<Carousel> list = carouselService.queryAll(YesOrNo.YES.type);
         return MingzhiJSONResult.ok(list);
     }
 

@@ -4,8 +4,8 @@ package com.mingzhi.enums;
  * 性别枚举
  */
 public enum YesOrNo {
-    No(0, "否"),
-    Yes(1, "是");
+    NO(0, "否"),
+    YES(1, "是");
     public final Integer type;
     public final String value;
 

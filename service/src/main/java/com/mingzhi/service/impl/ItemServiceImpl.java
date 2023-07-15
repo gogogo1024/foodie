@@ -143,8 +143,7 @@ public class ItemServiceImpl implements ItemService {
         for (ItemCommentVO vo : list) {
             vo.setNickname(DesensitizationUtil.commonDisplay(vo.getNickname()));
         }
-        PagedGridResult pagedGridResult = new PagedGridResult();
-        return pagedGridResult.setterPagedGrid(list, page);
+        return PagedGridResult.setterPagedGrid(list, page);
     }
 
     /**
