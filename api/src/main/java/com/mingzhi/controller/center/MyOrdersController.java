@@ -1,6 +1,7 @@
 package com.mingzhi.controller.center;
 
 import com.mingzhi.controller.BaseController;
+import com.mingzhi.pojo.vo.OrderStatusCountsVO;
 import com.mingzhi.service.center.MyOrdersService;
 import com.mingzhi.utils.MingzhiJSONResult;
 import com.mingzhi.utils.PagedGridResult;
@@ -113,8 +114,23 @@ public class MyOrdersController extends BaseController {
 
     }
 
-    @Operation(summary = "查询订单动向", description = "查询订单动向", method = "DELETE")
-    @DeleteMapping("/trend")
+    @Operation(summary = "获取用户不同状态订单数", description = "获取用户不同状态订单数", method = "POST")
+    @PostMapping("/statusCounts")
+    public MingzhiJSONResult getOrderStatusCounts(
+            @Parameter(name = "userId", required = true, description = "用户id")
+            @RequestParam(required = true) String userId
+    ) {
+        if (StringUtils.isBlank(userId)) {
+            return MingzhiJSONResult.errorMsg("用户id不能为空");
+
+        }
+        OrderStatusCountsVO orderStatusCountsVO = myOrdersService.getMyOrderStatusCounts(userId);
+        return MingzhiJSONResult.ok(orderStatusCountsVO);
+
+    }
+
+    @Operation(summary = "查询订单动向", description = "查询订单动向", method = "POST")
+    @PostMapping("/trend")
     public MingzhiJSONResult trend(
             @Parameter(name = "userId", description = "用户id", required = true)
             @RequestParam String userId,

@@ -9,6 +9,7 @@ import com.mingzhi.mapper.OrdersMapperCustom;
 import com.mingzhi.pojo.OrderStatus;
 import com.mingzhi.pojo.Orders;
 import com.mingzhi.pojo.vo.MyOrdersVO;
+import com.mingzhi.pojo.vo.OrderStatusCountsVO;
 import com.mingzhi.service.center.MyOrdersService;
 import com.mingzhi.utils.PagedGridResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,5 +143,39 @@ public class MyOrdersServiceImpl implements MyOrdersService {
         PageHelper.startPage(page, pageSize);
         List<OrderStatus> list = ordersMapperCustom.getMyOrderTrend(map);
         return PagedGridResult.setterPagedGrid(list, page);
+    }
+
+    /**
+     * 查询用户订单数
+     *
+     * @param userId 用户id
+     * @return 用户订单数
+     */
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public OrderStatusCountsVO getMyOrderStatusCounts(String userId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("orderStatus", OrderStatusEnum.WAIT_PAY.type);
+        int waitPayCounts = ordersMapperCustom.getMyOrderStatusCounts(map);
+
+        map.put("orderStatus", OrderStatusEnum.WAIT_DELIVER.type);
+        int waitDeliverCounts = ordersMapperCustom.getMyOrderStatusCounts(map);
+
+        map.put("orderStatus", OrderStatusEnum.WAIT_RECEIVE.type);
+        int waitReceiveCounts = ordersMapperCustom.getMyOrderStatusCounts(map);
+
+        map.put("orderStatus", OrderStatusEnum.SUCCESS.type);
+        map.put("isComment", YesOrNo.NO.type);
+        int waitSuccessCounts = ordersMapperCustom.getMyOrderStatusCounts(map);
+        OrderStatusCountsVO orderStatusCountsVO = new OrderStatusCountsVO(
+                waitPayCounts,
+                waitDeliverCounts,
+                waitReceiveCounts,
+                waitSuccessCounts
+        );
+
+
+        return orderStatusCountsVO;
     }
 }

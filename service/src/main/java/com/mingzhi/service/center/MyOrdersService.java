@@ -1,6 +1,7 @@
 package com.mingzhi.service.center;
 
 import com.mingzhi.pojo.Orders;
+import com.mingzhi.pojo.vo.OrderStatusCountsVO;
 import com.mingzhi.utils.PagedGridResult;
 
 public interface MyOrdersService {
@@ -45,4 +46,12 @@ public interface MyOrdersService {
     public Orders queryMyOrder(String userId, String orderId);
 
     PagedGridResult getOrdersTrend(String userId, Integer page, Integer pageSize);
+
+    /**
+     * 查询用户订单数
+     *
+     * @param userId 用户id
+     * @return 用户订单数
+     */
+    public OrderStatusCountsVO getMyOrderStatusCounts(String userId);
 }

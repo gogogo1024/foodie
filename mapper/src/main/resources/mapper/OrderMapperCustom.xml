@@ -73,4 +73,14 @@
           AND os.order_status in (20, 30, 40)
         ORDER BY os.order_id DESC
     </select>
+    <select id="getMyOrderStatusCounts" parameterType="Map" resultType="int">
+        SELECT COUNT(1)
+        FROM orders AS o
+        LEFT JOIN order_status AS os ON o.id = os.order_id
+        WHERE o.user_id = #{paramsMap.userId}
+        AND os.order_status = #{paramsMap.orderStatus}
+        <if test="paramsMap.isComment!=null">
+            And o.is_comment = #{paramsMap.isComment}
+        </if>
+    </select>
 </mapper>

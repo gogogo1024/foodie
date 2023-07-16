@@ -12,5 +12,7 @@ public interface OrdersMapperCustom {
 
     public List<OrderStatus> getMyOrderTrend(@Param("paramsMap") Map<String, Object> map);
 
+    public int getMyOrderStatusCounts(@Param("paramsMap") Map<String, Object> map);
+
 
 }
