@@ -1,18 +1,17 @@
 # tomcat设置
 server:
-  port: 8088
+  #  port: 8088
   tomcat:
     uri-encoding: UTF-8
 
 # 数据库配置以及hikari配置
 spring:
+  profiles:
+    active: dev
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-
     username: root
-    password: huangcheng900
-    url: jdbc:mysql://127.0.0.1:3306/foodie?characterEncoding=UTF-8&useSSL=false&useUnicode=true&serverTimezone=UTC&allowPublicKeyRetrieval=true
     hikari:
       connection-timeout: 30000       # 等待连接池分配连接的最大时长（毫秒），超过这个时长还没可用的连接则发生SQLException， 默认:30秒
       minimum-idle: 5                 # 最小连接数
@@ -24,15 +23,13 @@ spring:
       connection-test-query: SELECT 1
   servlet:
     multipart:
-      max-file-size: 5KB
-      max-request-size: 5KB
+      max-file-size: 50MB
+      max-request-size: 50MB
 
 # mybatis设置
 mybatis:
   type-aliases-package: com.mingzhi.pojo        # 所有POJO类所在包路径
   mapper-locations: classpath:mapper/*.xml      # mapper映射文件
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 # 通用 Mapper 设置
 mapper:

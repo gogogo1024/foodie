@@ -1,0 +1,18 @@
+# tomcat设置
+server:
+  port: 8088
+  tomcat:
+    uri-encoding: UTF-8
+
+## 数据库配置以及hikari配置
+spring:
+  datasource:
+    password: huangcheng900
+    url: jdbc:mysql://127.0.0.1:3306/foodie?characterEncoding=UTF-8&useSSL=false&useUnicode=true&serverTimezone=UTC&allowPublicKeyRetrieval=true
+
+# mybatis设置
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
