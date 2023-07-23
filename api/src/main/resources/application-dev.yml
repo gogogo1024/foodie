@@ -9,7 +9,13 @@ spring:
   datasource:
     password: huangcheng900
     url: jdbc:mysql://127.0.0.1:3306/foodie?characterEncoding=UTF-8&useSSL=false&useUnicode=true&serverTimezone=UTC&allowPublicKeyRetrieval=true
-
+  data:
+    redis:
+      database: 0
+      host: 127.0.0.1
+      port: 6379
+      username: default
+      password: huangcheng900
 # mybatis设置
 mybatis:
   configuration:

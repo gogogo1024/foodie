@@ -9,6 +9,7 @@ import com.mingzhi.pojo.OrderItems;
 import com.mingzhi.pojo.OrderStatus;
 import com.mingzhi.pojo.Orders;
 import com.mingzhi.pojo.UserAddress;
+import com.mingzhi.pojo.bo.ShopCartBO;
 import com.mingzhi.pojo.bo.SubmitOrderBO;
 import com.mingzhi.pojo.vo.ItemSpecVO;
 import com.mingzhi.pojo.vo.MerchantOrderVO;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -51,7 +53,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public OrderVO creatOrder(SubmitOrderBO submitOrderBO) {
+    public OrderVO creatOrder(SubmitOrderBO submitOrderBO, List<ShopCartBO> shopCartBOList) {
         String userId = submitOrderBO.getUserId();
         String addressId = submitOrderBO.getAddressId();
         String itemSectIds = submitOrderBO.getItemSpecIds();
@@ -70,7 +72,6 @@ public class OrderServiceImpl implements OrderService {
         order.setReceiverName(userAddress.getReceiver());
         order.setReceiverMobile(userAddress.getMobile());
 
-        // TODO 商品购买数量重新从redis中获取
         int buyCounts = 1;
         order.setPostAmount(postAmount);
         order.setPayMethod(payMethod);
@@ -183,6 +184,23 @@ public class OrderServiceImpl implements OrderService {
         orderStatus.setOrderStatus(OrderStatusEnum.CLOSE.type);
         orderStatus.setCloseTime(new Date());
         orderStatusMapper.updateByPrimaryKeySelective(orderStatus);
+    }
+
+    /**
+     * 通过商品规格id查询匹配的购物车商品BO
+     *
+     * @param shopCartBOList 购物车商品 list
+     * @param specId         商品规格id
+     * @return 匹配的购物车商品BO
+     */
+
+    private ShopCartBO getBuyCountsFromList(List<ShopCartBO> shopCartBOList, String specId) {
+        for (ShopCartBO shopCartBO : shopCartBOList) {
+            if (Objects.equals(shopCartBO.getSpecId(), specId)) {
+                return shopCartBO;
+            }
+        }
+        return null;
     }
 
 }

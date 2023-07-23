@@ -3,17 +3,21 @@ package com.mingzhi.controller;
 import com.mingzhi.enums.OrderStatusEnum;
 import com.mingzhi.enums.PayMethod;
 import com.mingzhi.pojo.OrderStatus;
+import com.mingzhi.pojo.bo.ShopCartBO;
 import com.mingzhi.pojo.bo.SubmitOrderBO;
 import com.mingzhi.pojo.vo.MerchantOrderVO;
 import com.mingzhi.pojo.vo.OrderVO;
 import com.mingzhi.service.AddressService;
 import com.mingzhi.service.OrderService;
+import com.mingzhi.utils.JsonUtils;
 import com.mingzhi.utils.MingzhiJSONResult;
+import com.mingzhi.utils.RedisOperator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +25,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Objects;
 
 
@@ -28,7 +33,7 @@ import java.util.Objects;
 @RestController()
 @ResponseBody()
 @RequestMapping("orders")
-public class OrdersController {
+public class OrdersController extends BaseController {
     final static Logger logger = LoggerFactory.getLogger(OrdersController.class);
     public static String returnUrl = "https://localhost:8088/orders/notifyMerchantOrderPaid";
     @Autowired
@@ -39,6 +44,8 @@ public class OrdersController {
     private OrderService orderService;
     private com.wechat.pay.java.core.notification.RequestParam WechatRequest;
 
+    @Autowired
+    private RedisOperator redisOperator;
 
     @Operation(summary = "用户提交订单", description = "用户提交订单", method = "POST")
     @PostMapping("/create")
@@ -50,8 +57,15 @@ public class OrdersController {
         if (!(Objects.equals(submitOrderBO.getPayMethod(), PayMethod.WEIXIN.type) || Objects.equals(submitOrderBO.getPayMethod(), PayMethod.ALIPAY.type))) {
             return MingzhiJSONResult.errorMsg("支付方式不支持");
         }
+        String shopCartStr = redisOperator.get(FOODIE_SHOPCART + ":" + submitOrderBO.getUserId());
+        if (StringUtils.isBlank(shopCartStr)) {
+            return MingzhiJSONResult.errorMsg("购物数据不正确");
+        }
+        List<ShopCartBO> list = JsonUtils.jsonToList(shopCartStr, ShopCartBO.class);
+
+
         // 订单创建
-        OrderVO orderVO = orderService.creatOrder(submitOrderBO);
+        OrderVO orderVO = orderService.creatOrder(submitOrderBO, list);
         String orderId = orderVO.getOrderId();
         MerchantOrderVO merchantOrderVO = orderVO.getMerchantOrderVO();
         merchantOrderVO.setReturnUrl(returnUrl);

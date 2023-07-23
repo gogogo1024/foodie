@@ -7,17 +7,21 @@ import com.mingzhi.pojo.vo.CategoryVO;
 import com.mingzhi.pojo.vo.NewItemsVO;
 import com.mingzhi.service.CarouselService;
 import com.mingzhi.service.CategoryService;
+import com.mingzhi.utils.JsonUtils;
 import com.mingzhi.utils.MingzhiJSONResult;
+import com.mingzhi.utils.RedisOperator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name = "首页", description = "首页展示的相关接口")
@@ -30,11 +34,21 @@ public class IndexController {
     private CarouselService carouselService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private RedisOperator redisOperator;
 
     @Operation(summary = "获取首页轮播图列表", description = "获取首页轮播图列表", method = "GET")
     @GetMapping("/carousel")
     public MingzhiJSONResult carousel() {
-        List<Carousel> list = carouselService.queryAll(YesOrNo.YES.type);
+        String carouselStr = redisOperator.get("carousel");
+        List<Carousel> list;
+        if (StringUtils.isBlank(carouselStr)) {
+            list = carouselService.queryAll(YesOrNo.YES.type);
+            redisOperator.set("carousel", JsonUtils.objectToJson(list));
+        } else {
+            list = JsonUtils.jsonToList(carouselStr, Carousel.class);
+        }
+
         return MingzhiJSONResult.ok(list);
     }
 
@@ -52,9 +66,15 @@ public class IndexController {
             @PathVariable Integer categoryId) {
         if (categoryId == null) {
             return MingzhiJSONResult.errorMsg("分类不存在");
-
         }
-        List<CategoryVO> list = categoryService.getSubCategoryList(categoryId);
+        String carouselStr = redisOperator.get("subCategory");
+        List<CategoryVO> list = new ArrayList<>();
+        if (StringUtils.isBlank(carouselStr)) {
+            list = categoryService.getSubCategoryList(categoryId);
+            redisOperator.set("carousel", JsonUtils.objectToJson(list));
+        } else {
+            list = JsonUtils.jsonToList(carouselStr, CategoryVO.class);
+        }
         return MingzhiJSONResult.ok(list);
     }
 

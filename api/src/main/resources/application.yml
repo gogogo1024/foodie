@@ -25,7 +25,6 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
-
 # mybatis设置
 mybatis:
   type-aliases-package: com.mingzhi.pojo        # 所有POJO类所在包路径

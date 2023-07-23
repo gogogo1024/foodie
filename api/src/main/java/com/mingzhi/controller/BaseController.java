@@ -4,10 +4,11 @@ import com.mingzhi.pojo.Orders;
 import com.mingzhi.service.center.MyOrdersService;
 import com.mingzhi.utils.MingzhiJSONResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
-@Component()
+@Controller()
 public class BaseController {
+    public static final String FOODIE_SHOPCART = "shopCart";
     @Autowired
     private MyOrdersService myOrdersService;
 

@@ -1,8 +1,11 @@
 package com.mingzhi.service;
 
 import com.mingzhi.pojo.OrderStatus;
+import com.mingzhi.pojo.bo.ShopCartBO;
 import com.mingzhi.pojo.bo.SubmitOrderBO;
 import com.mingzhi.pojo.vo.OrderVO;
+
+import java.util.List;
 
 public interface OrderService {
     /**
@@ -11,7 +14,7 @@ public interface OrderService {
      * @param submitOrderBO 订单创建BO
      * @return OrderVO OrderVO
      */
-    public OrderVO creatOrder(SubmitOrderBO submitOrderBO);
+    public OrderVO creatOrder(SubmitOrderBO submitOrderBO, List<ShopCartBO> list);
 
     /**
      * 修改订单状态
