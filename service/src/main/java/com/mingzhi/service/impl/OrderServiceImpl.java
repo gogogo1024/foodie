@@ -72,7 +72,7 @@ public class OrderServiceImpl implements OrderService {
         order.setReceiverName(userAddress.getReceiver());
         order.setReceiverMobile(userAddress.getMobile());
 
-        int buyCounts = 1;
+
         order.setPostAmount(postAmount);
         order.setPayMethod(payMethod);
         order.setLeftMsg(leftMsg);
@@ -86,8 +86,16 @@ public class OrderServiceImpl implements OrderService {
         int realPayAmount = 0;
         List<ItemSpecVO> itemSpecVOList = itemService.queryItemsSpecBySpecIds(itemSectIds);
         List<OrderItems> list = new ArrayList<>();
-
+        List<ShopCartBO> scBO = new ArrayList<>();
         for (ItemSpecVO itemSpecVO : itemSpecVOList) {
+            ShopCartBO shopCart = getBuyCountsFromList(shopCartBOList, itemSpecVO.getItemSpecId());
+            int buyCounts = 0;
+            if (shopCart != null) {
+                buyCounts = shopCart.getBuyCounts();
+                scBO.add(shopCart);
+            } else {
+                throw new RuntimeException("商品参数有问题，取消交易");
+            }
             totalAmount += itemSpecVO.getPriceNormal() * buyCounts;
             realPayAmount += itemSpecVO.getPriceDiscount() * buyCounts;
             OrderItems orderItems = new OrderItems();
@@ -132,6 +140,7 @@ public class OrderServiceImpl implements OrderService {
         OrderVO orderVO = new OrderVO();
         orderVO.setOrderId(orderId);
         orderVO.setMerchantOrderVO(merchantOrderVO);
+        orderVO.setShopCartBOList(scBO);
         return orderVO;
     }
 

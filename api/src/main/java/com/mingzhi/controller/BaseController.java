@@ -8,7 +8,11 @@ import org.springframework.stereotype.Controller;
 
 @Controller()
 public class BaseController {
-    public static final String FOODIE_SHOPCART = "shopCart";
+    public static final String FOODIE_SHOP_CART = "shopcart";
+
+    public static String RETURN_URL = "https://localhost:8088/orders/notifyMerchantOrderPaid";
+    public static String MERCHANT_ORDER_URL = "https://localhost:8088/orders/notifyMerchantOrderPaid";
+
     @Autowired
     private MyOrdersService myOrdersService;
 

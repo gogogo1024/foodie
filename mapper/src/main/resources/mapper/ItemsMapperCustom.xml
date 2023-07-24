@@ -81,7 +81,7 @@
     <select id="queryItemsBySpecIds" parameterType="List" resultType="com.mingzhi.pojo.vo.ShopCartVO">
         SELECT i.id AS itemId,
         i.item_name AS itemName,
-        ii.url AS imgUrl,
+        ii.url AS itemImgUrl,
         isp.id AS specId,
         isp.`name` AS specName,
         isp.price_discount AS priceDiscount,

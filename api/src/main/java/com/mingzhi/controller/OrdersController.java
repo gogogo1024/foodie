@@ -9,6 +9,7 @@ import com.mingzhi.pojo.vo.MerchantOrderVO;
 import com.mingzhi.pojo.vo.OrderVO;
 import com.mingzhi.service.AddressService;
 import com.mingzhi.service.OrderService;
+import com.mingzhi.utils.CookieUtils;
 import com.mingzhi.utils.JsonUtils;
 import com.mingzhi.utils.MingzhiJSONResult;
 import com.mingzhi.utils.RedisOperator;
@@ -35,7 +36,6 @@ import java.util.Objects;
 @RequestMapping("orders")
 public class OrdersController extends BaseController {
     final static Logger logger = LoggerFactory.getLogger(OrdersController.class);
-    public static String returnUrl = "https://localhost:8088/orders/notifyMerchantOrderPaid";
     @Autowired
     private AddressService addressService;
     @Autowired
@@ -57,7 +57,7 @@ public class OrdersController extends BaseController {
         if (!(Objects.equals(submitOrderBO.getPayMethod(), PayMethod.WEIXIN.type) || Objects.equals(submitOrderBO.getPayMethod(), PayMethod.ALIPAY.type))) {
             return MingzhiJSONResult.errorMsg("支付方式不支持");
         }
-        String shopCartStr = redisOperator.get(FOODIE_SHOPCART + ":" + submitOrderBO.getUserId());
+        String shopCartStr = redisOperator.get(FOODIE_SHOP_CART + ":" + submitOrderBO.getUserId());
         if (StringUtils.isBlank(shopCartStr)) {
             return MingzhiJSONResult.errorMsg("购物数据不正确");
         }
@@ -68,20 +68,24 @@ public class OrdersController extends BaseController {
         OrderVO orderVO = orderService.creatOrder(submitOrderBO, list);
         String orderId = orderVO.getOrderId();
         MerchantOrderVO merchantOrderVO = orderVO.getMerchantOrderVO();
-        merchantOrderVO.setReturnUrl(returnUrl);
+        merchantOrderVO.setReturnUrl(RETURN_URL);
         // 目前都为1分钱暂时
         merchantOrderVO.setAmount(1);
-        // 移除购物车中已结算商品
-        // TODO redis中移除购物车中已结算商品
-//        CookieUtils.setCookie(request, response, "shopcart", "", true);
 
+        // 移除购物车中已结算商品redis
+        if (list != null) {
+            list.removeAll(orderVO.getShopCartBOList());
+        }
+        redisOperator.set(FOODIE_SHOP_CART + ":" + submitOrderBO.getUserId(), JsonUtils.objectToJson(list));
+        // 移除购物车中已结算商品cookie
+        CookieUtils.setCookie(request, response, FOODIE_SHOP_CART, JsonUtils.objectToJson(list), true);
 
         // 调用支付中心，保存支付中心订单
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<MerchantOrderVO> entity = new HttpEntity<>(merchantOrderVO, httpHeaders);
         ResponseEntity<MingzhiJSONResult> responseEntity = restTemplate.postForEntity(
-                "http://127.0.0.1:8088/payment/createMerchantOrder",
+                MERCHANT_ORDER_URL,
                 entity,
                 MingzhiJSONResult.class
         );

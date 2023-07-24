@@ -51,7 +51,7 @@ public class ShopController extends BaseController {
         if (StringUtils.isBlank(userId)) {
             return MingzhiJSONResult.errorMsg(null);
         }
-        String shopCartJSONStr = redisOperator.get(FOODIE_SHOPCART + ":" + userId);
+        String shopCartJSONStr = redisOperator.get(FOODIE_SHOP_CART + ":" + userId);
         List<ShopCartBO> list = null;
         if (StringUtils.isNotBlank(shopCartJSONStr)) {
             list = JsonUtils.jsonToList(shopCartJSONStr, ShopCartBO.class);
@@ -75,7 +75,7 @@ public class ShopController extends BaseController {
             // 直接添加到购物车中
             list.add(shopCartBO);
         }
-        redisOperator.set(FOODIE_SHOPCART + ":" + userId, JsonUtils.objectToJson(list));
+        redisOperator.set(FOODIE_SHOP_CART + ":" + userId, JsonUtils.objectToJson(list));
         System.out.println(shopCartBO);
         return MingzhiJSONResult.ok();
     }
@@ -113,7 +113,7 @@ public class ShopController extends BaseController {
             return MingzhiJSONResult.errorMsg(null);
         }
         // 用户在页面删除购物车中的商品数据，如果此时用户已经登录，则需要同步删除redis购物车中的商品
-        String shopCartJSONStr = redisOperator.get(FOODIE_SHOPCART + ":" + userId);
+        String shopCartJSONStr = redisOperator.get(FOODIE_SHOP_CART + ":" + userId);
         if (StringUtils.isNotBlank(shopCartJSONStr)) {
             // redis中已经有购物车了
             List<ShopCartBO> list = JsonUtils.jsonToList(shopCartJSONStr, ShopCartBO.class);
@@ -128,7 +128,7 @@ public class ShopController extends BaseController {
                 }
             }
             // 覆盖现有redis中的购物车
-            redisOperator.set(FOODIE_SHOPCART + ":" + userId, JsonUtils.objectToJson(list));
+            redisOperator.set(FOODIE_SHOP_CART + ":" + userId, JsonUtils.objectToJson(list));
         }
 
         return MingzhiJSONResult.ok();

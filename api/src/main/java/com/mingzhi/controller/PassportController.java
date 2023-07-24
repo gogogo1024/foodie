@@ -1,6 +1,7 @@
 package com.mingzhi.controller;
 
 import com.mingzhi.pojo.Users;
+import com.mingzhi.pojo.bo.ShopCartBO;
 import com.mingzhi.pojo.bo.UserBO;
 import com.mingzhi.service.UserService;
 import com.mingzhi.utils.*;
@@ -14,14 +15,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Tag(name = "注册登录", description = "用户注册登录")
 @RestController()
 @ResponseBody()
 @RequestMapping("passport")
-public class PassportController {
+public class PassportController extends BaseController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RedisOperator redisOperator;
 
     @Operation(summary = "用户名是否存在", description = "用户名是否存在", method = "GET")
     @GetMapping("/usernameIsExist")
@@ -72,9 +78,8 @@ public class PassportController {
                 "unknownProperty",
                 "createdTime",
         });
-        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(user), true);
-        //TODO 生成用户token,会话存入redis
-        //TODO 同步购物车数据
+
+        syncShopCartToCookieRedis(user.getId(), request, response);
         return MingzhiJSONResult.ok();
     }
 
@@ -96,12 +101,15 @@ public class PassportController {
             return MingzhiJSONResult.errorMsg("用户名或者密码不正确");
 
         }
+
         PojoUtils.setPojoNullProperty(user, new String[]{
                 "password",
                 "unknownProperty",
                 "createdTime",
         });
         CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(user), true);
+
+        syncShopCartToCookieRedis(user.getId(), request, response);
         return MingzhiJSONResult.ok(user);
 
     }
@@ -112,7 +120,63 @@ public class PassportController {
                                     HttpServletRequest request,
                                     HttpServletResponse response) throws NoSuchAlgorithmException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         CookieUtils.deleteCookie(request, response, "user");
+        CookieUtils.deleteCookie(request, response, FOODIE_SHOP_CART);
         return MingzhiJSONResult.ok();
+
+    }
+
+    /**
+     * 同步购物车数据到redis和cookie
+     *
+     * @param userId   用户id
+     * @param request  HttpServletRequest
+     * @param response HttpServletResponse
+     */
+
+    private void syncShopCartToCookieRedis(String userId, HttpServletRequest request, HttpServletResponse response) {
+        String shopCartJSONRedis = redisOperator.get(FOODIE_SHOP_CART + ":" + userId);
+        String shopCartCookie = CookieUtils.getCookieValue(request, FOODIE_SHOP_CART, true);
+        if (StringUtils.isBlank(shopCartJSONRedis)) {
+            if (StringUtils.isNotBlank(shopCartCookie)) {
+                redisOperator.set(FOODIE_SHOP_CART + ":" + userId, shopCartCookie);
+            }
+        } else {
+            if (StringUtils.isNotBlank(shopCartCookie)) {
+                // merge cookie and redis(compare specId)
+                //  redis ∪ (cookie ∩ redis (base on cookie compare by specId)))
+                // 1. equal
+                //    1.1 cookie override redis
+                //    1.2 remove cookie
+                // 2. not equal no process
+                // 3. left cookie added to redis
+                List<ShopCartBO> shopCartBORedisList = JsonUtils.jsonToList(shopCartJSONRedis, ShopCartBO.class);
+                List<ShopCartBO> shopCartBOCookieList = JsonUtils.jsonToList(shopCartCookie, ShopCartBO.class);
+                List<ShopCartBO> toBeDeletedList = new ArrayList<>();
+                if (shopCartBORedisList != null) {
+                    for (ShopCartBO oscb : shopCartBORedisList) {
+                        String redisSpecId = oscb.getSpecId();
+                        if (shopCartBOCookieList != null) {
+                            for (ShopCartBO iscb : shopCartBOCookieList) {
+                                String cookieSpecId = iscb.getSpecId();
+                                if (redisSpecId.equals(cookieSpecId)) {
+                                    oscb.setBuyCounts(iscb.getBuyCounts());
+                                    toBeDeletedList.add(iscb);
+                                }
+                            }
+                        }
+                    }
+                }
+                shopCartBOCookieList.removeAll(toBeDeletedList);
+                shopCartBORedisList.addAll(shopCartBOCookieList);
+
+                redisOperator.set(FOODIE_SHOP_CART + ":" + userId, JsonUtils.objectToJson(shopCartBORedisList));
+                CookieUtils.setCookie(request, response, FOODIE_SHOP_CART, JsonUtils.objectToJson(shopCartBORedisList), true);
+
+            } else {
+                CookieUtils.setCookie(request, response, FOODIE_SHOP_CART, shopCartJSONRedis, true);
+            }
+        }
+
 
     }
 
