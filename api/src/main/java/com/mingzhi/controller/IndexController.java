@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name = "首页", description = "首页展示的相关接口")
@@ -67,13 +66,18 @@ public class IndexController {
         if (categoryId == null) {
             return MingzhiJSONResult.errorMsg("分类不存在");
         }
-        String carouselStr = redisOperator.get("subCategory");
-        List<CategoryVO> list = new ArrayList<>();
-        if (StringUtils.isBlank(carouselStr)) {
+        String categoryRedisStr = redisOperator.get("subCategory:" + categoryId);
+        List<CategoryVO> list;
+        if (StringUtils.isBlank(categoryRedisStr)) {
             list = categoryService.getSubCategoryList(categoryId);
-            redisOperator.set("carousel", JsonUtils.objectToJson(list));
+            // 应对缓存穿透（非法请求不存在的数据，直接设置该缓存为空）
+            if (list != null && list.size() > 0) {
+                redisOperator.set("subCategory:" + categoryId, JsonUtils.objectToJson(list));
+            } else {
+                redisOperator.set("subCategory:" + categoryId, JsonUtils.objectToJson(list), 5 * 60);
+            }
         } else {
-            list = JsonUtils.jsonToList(carouselStr, CategoryVO.class);
+            list = JsonUtils.jsonToList(categoryRedisStr, CategoryVO.class);
         }
         return MingzhiJSONResult.ok(list);
     }
