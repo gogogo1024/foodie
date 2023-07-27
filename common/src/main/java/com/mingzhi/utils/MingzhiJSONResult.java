@@ -78,6 +78,10 @@ public class MingzhiJSONResult {
         return new MingzhiJSONResult(556, msg, null);
     }
 
+    public static MingzhiJSONResult errorUserTicket(String msg) {
+        return new MingzhiJSONResult(557, msg, null);
+    }
+
     public Boolean isOK() {
         return this.status == 200;
     }

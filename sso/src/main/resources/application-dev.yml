@@ -1,6 +1,6 @@
 # tomcat设置
 server:
-  port: 8088
+  port: 8090
   tomcat:
     uri-encoding: UTF-8
 
@@ -15,9 +15,9 @@ spring:
       host: 127.0.0.1
       port: 6379
       username: default
-      password: huangcheng900
-  session:
-    store-type: redis
+#      password: huangcheng900
+#  session:
+#    store-type: redis
 
 # mybatis设置
 mybatis:

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public final class CookieUtils {
 
@@ -177,7 +178,7 @@ public final class CookieUtils {
             if (cookieValue == null) {
                 cookieValue = "";
             } else if (isEncode) {
-                cookieValue = URLEncoder.encode(cookieValue, "utf-8");
+                cookieValue = URLEncoder.encode(cookieValue, StandardCharsets.UTF_8);
             }
             Cookie cookie = new Cookie(cookieName, cookieValue);
             if (cookieMaxage > 0) {

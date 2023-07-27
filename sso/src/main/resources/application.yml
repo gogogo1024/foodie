@@ -1,0 +1,75 @@
+# tomcat设置
+server:
+  #  port: 8088
+  tomcat:
+    uri-encoding: UTF-8
+
+# 数据库配置以及hikari配置
+spring:
+  profiles:
+    active: dev
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    hikari:
+      connection-timeout: 30000       # 等待连接池分配连接的最大时长（毫秒），超过这个时长还没可用的连接则发生SQLException， 默认:30秒
+      minimum-idle: 5                 # 最小连接数
+      maximum-pool-size: 20           # 最大连接数
+      auto-commit: true               # 自动提交
+      idle-timeout: 600000            # 连接超时的最大时长（毫秒），超时则被释放（retired），默认:10分钟
+      pool-name: DateSourceHikariCP   # 连接池名字
+      max-lifetime: 1800000           # 连接的生命时长（毫秒），超时而且没被使用则被释放（retired），默认:30分钟 1800000ms
+      connection-test-query: SELECT 1
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  thymeleaf:
+    mode: HTML
+    encoding: UTF-8
+    prefix: classpath:/templates/
+    suffix: .html
+# mybatis设置
+mybatis:
+  type-aliases-package: com.mingzhi.pojo        # 所有POJO类所在包路径
+  mapper-locations: classpath:mapper/*.xml      # mapper映射文件
+
+# 通用 Mapper 设置
+mapper:
+  mappers: com.mingzhi.my.mapper.MyMapper
+  not-empty: false
+  identity: MYSQL
+# mybatis-pageHelper配置
+pagehelper:
+  helperDialect: mysql
+  supportMethodsArguments: true
+
+logging:
+  #  level.org.springframework.boot.autoconfigure: error #spring的自动装配日志只打error，否则debug输出的会打印很多自动装配的log信息到控制台
+  config: classpath:log4j2.xml
+
+#  springdoc swagger3
+springdoc:
+  swagger-ui:
+    enabled: true
+    layout: BaseLayout
+    path: /swagger-ui.html
+  api-docs:
+    enabled: true
+  packages-to-scan:
+    com.mingzhi.controller
+# wechatpay sdk 配置
+wechatpay:
+  appId: "appId"
+  merchantId: "merchantId"
+  privateKeyPath: "privateKeyPath"
+  merchantSerialNumber: "merchantSerialNumber"
+  apiV3key: "apiV3key"
+  notifyUrl: "https://localhost:8088/orders/notifyWechatPaid"
+# 一些基本配置
+baseCfg:
+  fileUploadUrl: "uploadImg/userFace"
+
+

@@ -3,6 +3,7 @@ package com.mingzhi.controller;
 import com.mingzhi.pojo.Users;
 import com.mingzhi.pojo.bo.ShopCartBO;
 import com.mingzhi.pojo.bo.UserBO;
+import com.mingzhi.pojo.vo.UsersVO;
 import com.mingzhi.service.UserService;
 import com.mingzhi.utils.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -73,11 +74,10 @@ public class PassportController extends BaseController {
         }
 
         Users user = userService.createUser(userBO);
-        PojoUtils.setPojoNullProperty(user, new String[]{
-                "password",
-                "unknownProperty",
-                "createdTime",
-        });
+        UsersVO usersVO = conventUserToUsersVO(user);
+
+        CookieUtils.setCookie(request, response, "user",
+                JsonUtils.objectToJson(usersVO), true);
 
         syncShopCartToCookieRedis(user.getId(), request, response);
         return MingzhiJSONResult.ok();
@@ -102,15 +102,19 @@ public class PassportController extends BaseController {
 
         }
 
-        PojoUtils.setPojoNullProperty(user, new String[]{
-                "password",
-                "unknownProperty",
-                "createdTime",
-        });
-        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(user), true);
+        UsersVO usersVO = conventUserToUsersVO(user);
+
+
+//        PojoUtils.setPojoNullProperty(user, new String[]{
+//                "password",
+//                "unknownProperty",
+//                "createdTime",
+//        });
+
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(usersVO), true);
 
         syncShopCartToCookieRedis(user.getId(), request, response);
-        return MingzhiJSONResult.ok(user);
+        return MingzhiJSONResult.ok(usersVO);
 
     }
 
@@ -119,8 +123,12 @@ public class PassportController extends BaseController {
     public MingzhiJSONResult logout(@RequestParam String userId,
                                     HttpServletRequest request,
                                     HttpServletResponse response) throws NoSuchAlgorithmException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        // cookie中用户登录信息
         CookieUtils.deleteCookie(request, response, "user");
+        // cookie中用户购物车信息
         CookieUtils.deleteCookie(request, response, FOODIE_SHOP_CART);
+        // redis中用户的token信息
+        redisOperator.del(REDIS_USER_TOKEN + ":" + userId);
         return MingzhiJSONResult.ok();
 
     }

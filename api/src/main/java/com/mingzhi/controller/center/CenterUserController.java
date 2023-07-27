@@ -1,7 +1,9 @@
 package com.mingzhi.controller.center;
 
+import com.mingzhi.controller.BaseController;
 import com.mingzhi.pojo.Users;
 import com.mingzhi.pojo.bo.center.CenterUserBO;
+import com.mingzhi.pojo.vo.UsersVO;
 import com.mingzhi.service.center.CenterUserService;
 import com.mingzhi.utils.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,7 +31,7 @@ import java.util.Map;
 @RestController()
 @ResponseBody()
 @RequestMapping("userInfo")
-public class CenterUserController {
+public class CenterUserController extends BaseController {
     @Autowired
     private CenterUserService centerUserService;
 
@@ -53,15 +55,17 @@ public class CenterUserController {
         }
         Users user = centerUserService.updateUserInfo(userId, centerUserBO);
 
-        PojoUtils.setPojoNullProperty(user, new String[]{
-                "password",
-                "mobile",
-                "email",
-                "updatedTime",
-                "birthday",
-                "createdTime",
-        });
-        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(user), true);
+//        PojoUtils.setPojoNullProperty(user, new String[]{
+//                "password",
+//                "mobile",
+//                "email",
+//                "updatedTime",
+//                "birthday",
+//                "createdTime",
+//        });
+        UsersVO usersVO = conventUserToUsersVO(user);
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(usersVO), true);
+
         return MingzhiJSONResult.ok(user);
 
     }
@@ -114,17 +118,9 @@ public class CenterUserController {
                 + "?t="
                 + DateUtil.getCurrentDateString(DateUtil.DATE_PATTERN);
         Users user = centerUserService.updateUserFace(userId, fileUrl);
-        PojoUtils.setPojoNullProperty(user, new String[]{
-                "password",
-                "mobile",
-                "email",
-                "updatedTime",
-                "birthday",
-                "createdTime",
-        });
-        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(user), true);
-        // TODO 增加令牌token，和redis整合
-        return MingzhiJSONResult.ok(user);
+        UsersVO usersVO = conventUserToUsersVO(user);
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(usersVO), true);
+        return MingzhiJSONResult.ok();
 
 
     }
