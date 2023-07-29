@@ -38,19 +38,15 @@ public final class CookieUtils {
             return null;
         }
         String retValue = null;
-        try {
-            for (Cookie cookie : cookieList) {
-                if (cookie.getName().equals(cookieName)) {
-                    if (isDecoder) {
-                        retValue = URLDecoder.decode(cookie.getValue(), "UTF-8");
-                    } else {
-                        retValue = cookie.getValue();
-                    }
-                    break;
+        for (Cookie cookie : cookieList) {
+            if (cookie.getName().equals(cookieName)) {
+                if (isDecoder) {
+                    retValue = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
+                } else {
+                    retValue = cookie.getValue();
                 }
+                break;
             }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         }
         return retValue;
     }
@@ -259,7 +255,9 @@ public final class CookieUtils {
                 domainName = "." + domains[len - 3] + "." + domains[len - 2] + "." + domains[len - 1];
             } else if (len <= 3 && len > 1) {
                 // xxx.com or xxx.cn
-                domainName = "." + domains[len - 2] + "." + domains[len - 1];
+//                domainName = "." + domains[len - 2] + "." + domains[len - 1];
+                domainName = domains[len - 2] + "." + domains[len - 1];
+
             } else {
                 domainName = serverName;
             }

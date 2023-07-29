@@ -3,7 +3,10 @@ server:
   port: 8090
   tomcat:
     uri-encoding: UTF-8
-
+  servlet:
+    session:
+      cookie:
+        same-site: strict
 ## 数据库配置以及hikari配置
 spring:
   datasource:
@@ -15,10 +18,7 @@ spring:
       host: 127.0.0.1
       port: 6379
       username: default
-#      password: huangcheng900
-#  session:
-#    store-type: redis
-
+      password: huangcheng900
 # mybatis设置
 mybatis:
   configuration:

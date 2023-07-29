@@ -17,6 +17,7 @@ public class CorsConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.addAllowedOrigin("http://localhost:8080");
         corsConfiguration.setAllowCredentials(true); //发送是否携带cookie信息
+
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
         UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();

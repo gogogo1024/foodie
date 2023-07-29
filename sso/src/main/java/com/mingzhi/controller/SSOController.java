@@ -3,10 +3,7 @@ package com.mingzhi.controller;
 import com.mingzhi.pojo.Users;
 import com.mingzhi.pojo.vo.UsersVO;
 import com.mingzhi.service.UserService;
-import com.mingzhi.utils.JsonUtils;
-import com.mingzhi.utils.MD5Utils;
-import com.mingzhi.utils.MingzhiJSONResult;
-import com.mingzhi.utils.RedisOperator;
+import com.mingzhi.utils.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,6 +37,14 @@ public class SSOController {
     @GetMapping("/login")
     public String login(String returnUrl, Model model, HttpServletRequest request, HttpServletResponse response) {
         model.addAttribute("returnUrl", returnUrl);
+        String userTicket = CookieUtils.getCookieValue(request, COOKIE_USER_TICKET, false);
+//        String userTicket = getCookie(request, COOKIE_USER_TICKET);
+
+        boolean isVerified = verifyUserTicket(userTicket);
+        if (isVerified) {
+            String tmpTicket = createTmpTicket();
+            return "redirect:" + returnUrl + "?tmpTicket=" + tmpTicket;
+        }
         return "login";
     }
 
@@ -47,7 +52,7 @@ public class SSOController {
     public String doLogin(String username, String password,
                           String returnUrl, Model model,
                           HttpServletRequest request, HttpServletResponse response) throws NoSuchAlgorithmException {
-
+        model.addAttribute("returnUrl", returnUrl);
         if (StringUtils.isBlank(username)
                 || StringUtils.isBlank(password)
         ) {
@@ -73,17 +78,17 @@ public class SSOController {
 
         // 生成全局ticket,代表用户在CAS端登录过
         String userTicket = UUID.randomUUID().toString().trim();
-
         // 全局ticket 存入sso端cookie
         setCookie(COOKIE_USER_TICKET, userTicket, response);
-        redisOperator.set(REDIS_USER_TICKET + ":" + user.getId(),
-                userTicket);
+        // userTicket关联用户id，并且放入到redis中
+        redisOperator.set(REDIS_USER_TICKET + ":" + userTicket, user.getId());
+        // 临时ticket，作为参数传递
         String tmpTicket = createTmpTicket();
         return "redirect:" + returnUrl + "?tmpTicket=" + tmpTicket;
 
     }
 
-    @PostMapping("verifyTmpTicket")
+    @PostMapping("/verifyTmpTicket")
     @ResponseBody
     public MingzhiJSONResult verifyTmpTicket(String tmpTicket,
                                              HttpServletRequest request,
@@ -96,11 +101,12 @@ public class SSOController {
                 return MingzhiJSONResult.errorUserTicket("用户ticket异常");
             } else {
                 redisOperator.del(REDIS_TMP_USER_TICKET + ":" + tmpTicket);
-//            }
             }
-//            String cookieUserTicket = CookieUtils.getCookieValue(request, COOKIE_USER_TICKET, false);
-
-            String cookieUserTicket = getCookie(request, COOKIE_USER_TICKET);
+            // 在谷歌浏览器80以下版本可以使用，高版本由于cookie的安全策略方式，
+            // 参考 https://developers.google.com/search/blog/2020/01/get-ready-for-new-samesitenone-secure?hl=zh-cn
+            // same-site具体值需要在server下配置
+            String cookieUserTicket = CookieUtils.getCookieValue(request, COOKIE_USER_TICKET, false);
+//            String cookieUserTicket = getCookie(request, COOKIE_USER_TICKET);
             String userId = redisOperator.get(REDIS_USER_TICKET + ":" + cookieUserTicket);
             if (StringUtils.isBlank(userId)) {
                 return MingzhiJSONResult.errorUserTicket("用户ticket异常");
@@ -113,18 +119,95 @@ public class SSOController {
         }
     }
 
+    @PostMapping("/logout")
+    @ResponseBody
+    public MingzhiJSONResult logout(String userId,
+                                    HttpServletRequest request,
+                                    HttpServletResponse response) throws Exception {
 
-    private String createTmpTicket() throws NoSuchAlgorithmException {
+        // 获取CAS中的用户ticket
+        String userTicket = getCookie(request, COOKIE_USER_TICKET);
+
+        // 清除redis && cookie中userTicket
+        deleteCookie(COOKIE_USER_TICKET, response);
+        redisOperator.del(REDIS_USER_TICKET + ":" + userTicket);
+
+        // 清除用户全局会话
+        redisOperator.del(REDIS_USER_TOKEN + ":" + userId);
+        return MingzhiJSONResult.ok();
+    }
+
+
+    private String createTmpTicket() {
         String tmpTicket = UUID.randomUUID().toString().trim();
-        redisOperator.set(REDIS_TMP_USER_TICKET + ":" + tmpTicket,
-                MD5Utils.getMD5Str(tmpTicket), 600);
+        try {
+            redisOperator.set(REDIS_TMP_USER_TICKET + ":" + tmpTicket,
+                    MD5Utils.getMD5Str(tmpTicket), 600);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
         return tmpTicket;
     }
 
-    private void setCookie(String key, String val, HttpServletResponse response) {
+
+    /**
+     * 校验CAS全局用户ticket
+     *
+     * @param userTicket 用户ticket
+     * @return 用户ticket是否有效
+     */
+    private boolean verifyUserTicket(String userTicket) {
+
+        // 0. 验证CAS门票不能为空
+        if (StringUtils.isBlank(userTicket)) {
+            return false;
+        }
+
+        // 验证CAS ticket是否有效
+        String userId = redisOperator.get(REDIS_USER_TICKET + ":" + userTicket);
+        if (StringUtils.isBlank(userId)) {
+            return false;
+        }
+
+        //  验证ticket对应的user会话是否存在
+        String userRedis = redisOperator.get(REDIS_USER_TOKEN + ":" + userId);
+        if (StringUtils.isBlank(userRedis)) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+//    private Optional<String> getCookie(HttpServletRequest request, String key) {
+//        Cookie[] cookies = request.getCookies();
+//        if (cookies == null || StringUtils.isBlank(key)) {
+//            return Optional.empty();
+//        }
+//        return Arrays.stream(cookies)
+//                .filter(cookie -> key.equals(cookie.getName()))
+//                .map(Cookie::getValue)
+//                .findAny();
+//    }
+
+    private void setCookie(String key,
+                           String val,
+                           HttpServletResponse response) {
+
         Cookie cookie = new Cookie(key, val);
         cookie.setDomain("sso.com");
         cookie.setPath("/");
+        response.addCookie(cookie);
+    }
+
+    private void deleteCookie(String key,
+                              HttpServletResponse response) {
+
+        Cookie cookie = new Cookie(key, null);
+        cookie.setDomain("sso.com");
+        cookie.setPath("/");
+        cookie.setMaxAge(-1);
+
         response.addCookie(cookie);
     }
 
@@ -136,14 +219,15 @@ public class SSOController {
         }
 
         String cookieValue = null;
-        for (Cookie cookie : cookieList) {
-            if (cookie.getName().equals(key)) {
-                cookieValue = cookie.getValue();
+        for (int i = 0; i < cookieList.length; i++) {
+            if (cookieList[i].getName().equals(key)) {
+                cookieValue = cookieList[i].getValue();
                 break;
             }
         }
 
         return cookieValue;
     }
+
 
 }

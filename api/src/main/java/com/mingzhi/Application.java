@@ -14,7 +14,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 //@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 
 @EnableScheduling // 开启定时任务
-//@EnableRedisHttpSession // 开启基于redis来管理spring中http的session管理
+//@EnableRedisHttpSession // 开启基于redis来管理spring中http的session
 public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);

@@ -20,7 +20,6 @@ public class CorsConfig {
         corsConfiguration.addAllowedOrigin("http://www.music.com");
         corsConfiguration.addAllowedOrigin("http://www.mtv.com:8080");
         corsConfiguration.addAllowedOrigin("http://www.music.com:8080");
-
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.setAllowCredentials(true); //发送是否携带cookie信息
