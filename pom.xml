@@ -15,6 +15,7 @@
         <module>service</module>
         <module>api</module>
         <module>sso</module>
+        <module>search</module>
     </modules>
 
     <properties>

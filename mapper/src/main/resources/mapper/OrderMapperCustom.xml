@@ -43,34 +43,34 @@
 
 
     <select id="getSubItems" parameterType="String" resultType="com.mingzhi.pojo.vo.MySubOrderItemVO">
-        SELECT oi.item_id AS itemId,
-        oi.item_name AS itemName,
-        oi.item_img AS itemImg,
-        oi.item_spec_id AS itemSpecId,
-        oi.item_spec_name AS itemSpecName,
-        oi.buy_counts AS buyCounts,
-        oi.price AS price
+        SELECT oi.item_id        AS itemId,
+               oi.item_name      AS itemName,
+               oi.item_img       AS itemImg,
+               oi.item_spec_id   AS itemSpecId,
+               oi.item_spec_name AS itemSpecName,
+               oi.buy_counts     AS buyCounts,
+               oi.price          AS price
         FROM order_items oi
         WHERE oi.order_id = #{orderId}
 
     </select>
     <select id="getMyOrderTrend" parameterType="Map" resultType="com.mingzhi.pojo.OrderStatus">
-        SELECT os.order_id as orderId,
-        os.order_status as orderStatus,
-        os.created_time as createdTime,
-        os.pay_time as payTime,
-        os.deliver_time as deliverTime,
-        os.success_time as successTime,
-        os.close_time as closeTime,
-        os.comment_time as commentTime
+        SELECT os.order_id     as orderId,
+               os.order_status as orderStatus,
+               os.created_time as createdTime,
+               os.pay_time     as payTime,
+               os.deliver_time as deliverTime,
+               os.success_time as successTime,
+               os.close_time   as closeTime,
+               os.comment_time as commentTime
         FROM orders o
-        LEFT JOIN
-        order_status os
-        ON
-        o.id = os.order_id
+                 LEFT JOIN
+             order_status os
+             ON
+                 o.id = os.order_id
         WHERE o.is_delete = 0
-        AND o.user_id = #{paramsMap.userId}
-        AND os.order_status in (20, 30, 40)
+          AND o.user_id = #{paramsMap.userId}
+          AND os.order_status in (20, 30, 40)
         ORDER BY os.order_id DESC
     </select>
     <select id="getMyOrderStatusCounts" parameterType="Map" resultType="int">

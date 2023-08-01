@@ -17,16 +17,16 @@
     </resultMap>
 
     <select id="getSubCategoryList" resultMap="myCategoryVO" parameterType="int">
-        SELECT f.id AS id,
-        f.`name` AS `name`,
-        f.type AS type,
-        f.father_id AS fatherId,
-        c.id AS subId,
-        c.`name` AS subName,
-        c.type AS subType,
-        c.father_id AS subFatherId
+        SELECT f.id        AS id,
+               f.`name`    AS `name`,
+               f.type      AS type,
+               f.father_id AS fatherId,
+               c.id        AS subId,
+               c.`name`    AS subName,
+               c.type      AS subType,
+               c.father_id AS subFatherId
         FROM category f
-        LEFT JOIN category c ON f.id = c.father_id
+                 LEFT JOIN category c ON f.id = c.father_id
         WHERE f.father_id = #{categoryId}
     </select>
     <!-- myNewItemsVO   -->
@@ -46,20 +46,20 @@
     </resultMap>
 
     <select id="getMoreItemsList" resultMap="myNewItemsVO" parameterType="map">
-        SELECT f.id AS categoryId,
-        f.`name` AS categoryName,
-        f.slogan AS slogan,
-        f.cat_image AS categoryImage,
-        f.bg_color AS bgColor,
-        i.id AS itemId,
-        i.item_name AS itemName,
-        ii.url AS itemUrl,
-        i.created_time AS createdTime
+        SELECT f.id           AS categoryId,
+               f.`name`       AS categoryName,
+               f.slogan       AS slogan,
+               f.cat_image    AS categoryImage,
+               f.bg_color     AS bgColor,
+               i.id           AS itemId,
+               i.item_name    AS itemName,
+               ii.url         AS itemUrl,
+               i.created_time AS createdTime
         FROM category f
-        LEFT JOIN items i ON f.id = i.root_cat_id
-        LEFT JOIN items_img ii ON i.id = ii.item_id
+                 LEFT JOIN items i ON f.id = i.root_cat_id
+                 LEFT JOIN items_img ii ON i.id = ii.item_id
         WHERE i.root_cat_id = #{paramsMap.categoryId}
-        AND ii.is_main = 1
+          AND ii.is_main = 1
         ORDER BY i.created_time DESC LIMIT 0, #{paramsMap.itemsLength}
 
     </select>
