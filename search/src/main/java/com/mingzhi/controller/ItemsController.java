@@ -1,20 +1,26 @@
 package com.mingzhi.controller;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+import com.mingzhi.service.ItemsESService;
+import com.mingzhi.utils.MingzhiJSONResult;
+import com.mingzhi.utils.PagedGridResult;
+import io.swagger.v3.oas.annotations.Operation;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 
-@Tag(name = "hello", description = "hello测试接口")
 @RestController()
+@RequestMapping("items")
 @ResponseBody()
-public class HelloController {
-    final static Logger logger = LoggerFactory.getLogger(HelloController.class);
+public class ItemsController {
+    final static Logger logger = LoggerFactory.getLogger(ItemsController.class);
+    @Autowired
+    private ItemsESService itemsESService;
 
     @GetMapping("/hello")
     public Object hello() {
@@ -22,16 +28,30 @@ public class HelloController {
         logger.info("info:slf4j hello");
         logger.debug("debug:slf4j hello");
 
-        return "Hello World!";
+        return "ElasticSearch~";
     }
 
-    @GetMapping("setSession")
-    public Object setSession(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        session.setAttribute("userInfo", "user");
-        session.setMaxInactiveInterval(3600);
-        session.getAttribute("userInfo");
-//        session.removeAttribute("userInfo");
-        return "ok";
+    @Operation(summary = "搜索商品", description = "搜索商品", method = "GET")
+    @GetMapping("/search")
+    public MingzhiJSONResult searchItems(
+            String keywords,
+            String sort,
+            Integer page,
+            Integer pageSize) {
+        if (StringUtils.isBlank(keywords)) {
+            return MingzhiJSONResult.errorMsg(null);
+        }
+
+        if (page == null) {
+            page = 1;
+        }
+
+        if (pageSize == null) {
+            pageSize = 20;
+        }
+
+        page--;
+        PagedGridResult pagedGridResult = itemsESService.searchItems(keywords, sort, page, pageSize);
+        return MingzhiJSONResult.ok(pagedGridResult);
     }
 }

@@ -163,8 +163,7 @@ public class ItemServiceImpl implements ItemService {
         map.put("sort", sort);
         PageHelper.startPage(page, pageSize);
         List<SearchItemsVO> list = itemsMapperCustom.searchItems(map);
-        PagedGridResult pagedGridResult = new PagedGridResult();
-        return pagedGridResult.setterPagedGrid(list, page);
+        return PagedGridResult.setterPagedGrid(list, page);
     }
 
     /**

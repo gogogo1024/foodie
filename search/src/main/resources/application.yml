@@ -1,3 +1,5 @@
+server:
+  port: 8033
 # 数据库配置以及hikari配置
 spring:
   profiles:
@@ -10,3 +12,6 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/foodie?characterEncoding=UTF-8&useSSL=false&useUnicode=true&serverTimezone=UTC&allowPublicKeyRetrieval=true
   elasticsearch:
     uris: http://127.0.0.1:9200
+logging:
+  #  level.org.springframework.boot.autoconfigure: error #spring的自动装配日志只打error，否则debug输出的会打印很多自动装配的log信息到控制台
+  config: classpath:log4j2.xml

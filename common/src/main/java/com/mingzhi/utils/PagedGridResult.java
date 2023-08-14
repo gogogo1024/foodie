@@ -26,6 +26,17 @@ public class PagedGridResult {
 
     }
 
+    // TODO 考虑封装elastic search 中的PageImpl
+    public static PagedGridResult setterESPagedGrid(List<?> list, Integer page) {
+        PagedGridResult pagedGridResult = new PagedGridResult();
+        pagedGridResult.setPage(page);
+        pagedGridResult.setRows(list);
+        pagedGridResult.setTotal(pagedGridResult.total);
+        pagedGridResult.setRecords(pagedGridResult.records);
+        return pagedGridResult;
+
+    }
+
     public int getPage() {
         return page;
     }

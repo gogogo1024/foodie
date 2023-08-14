@@ -2,6 +2,7 @@ package com.mingzhi;
 
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import tk.mybatis.spring.annotation.MapperScan;
@@ -13,6 +14,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 // 排除SecurityAutoConfiguration类，就不需要输入认证
 //@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 
+@SpringBootApplication()
 @EnableScheduling // 开启定时任务
 //@EnableRedisHttpSession // 开启基于redis来管理spring中http的session
 public class Application {

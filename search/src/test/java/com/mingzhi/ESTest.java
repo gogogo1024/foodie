@@ -35,9 +35,9 @@ public class ESTest {
     private ElasticsearchTemplate elasticsearchTemplate;
 
     // 使用ElasticsearchClient也可以但是不建议
-//    @Autowired
-//    @Qualifier("elasticsearchClient")
-//    private ElasticsearchClient client;
+    //    @Autowired
+    //    @Qualifier("elasticsearchClient")
+    //    private ElasticsearchClient client;
 
     @Test
     public void createIndexStu() throws IOException {
