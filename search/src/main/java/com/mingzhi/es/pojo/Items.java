@@ -20,6 +20,10 @@ public class Items {
     private String imgUrl;
     @Field(store = true, type = FieldType.Integer)
     private Integer price;
+    @Field(store = true, type = FieldType.Keyword)
+    private String sellCounts;
+    @Field(store = true)
+    private String description;
 
     @Override
     public String toString() {
@@ -32,11 +36,6 @@ public class Items {
                 ", description='" + description + '\'' +
                 '}';
     }
-
-    @Field(store = true, type = FieldType.Keyword)
-    private String sellCounts;
-    @Field(store = true)
-    private String description;
 
     public String getItemId() {
         return itemId;

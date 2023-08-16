@@ -1,0 +1,41 @@
+server:
+  port: 8001
+# 数据库配置以及hikari配置
+spring:
+  profiles:
+    active: dev
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: huangcheng900
+    url: jdbc:mysql://127.0.0.1:3306/foodie?characterEncoding=UTF-8&useSSL=false&useUnicode=true&serverTimezone=UTC&allowPublicKeyRetrieval=true
+  rabbitmq:
+    addresses: 127.0.0.1:5672
+    username: guest
+    password: guest
+    connection-timeout: 10000
+    publisher-confirm-type: simple
+    publisher-returns: true
+    template:
+      mandatory: true
+    listener:
+      simple:
+        acknowledge-mode: manual
+        concurrency: 5
+        prefetch: 1
+        max-concurrency: 10
+      # 自定义配置信息
+      # 代码中使用方式 ${spring.rabbitmq.listener.order.exchange.name}
+      order:
+        exchange:
+          name: order-exchange
+          durable: true
+          type: topic
+          key: order.*
+    virtual-host: /
+
+
+logging:
+  #  level.org.springframework.boot.autoconfigure: error #spring的自动装配日志只打error，否则debug输出的会打印很多自动装配的log信息到控制台
+  config: classpath:log4j2.xml
