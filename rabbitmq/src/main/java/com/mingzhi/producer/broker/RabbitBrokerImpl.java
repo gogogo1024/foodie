@@ -1,6 +1,7 @@
 package com.mingzhi.producer.broker;
 
 import com.mingzhi.api.Message;
+import com.mingzhi.api.MessageType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ public class RabbitBrokerImpl implements RabbitBroker {
 
     @Override
     public void rapidSend(Message message) {
+        message.setMessageType(MessageType.RAPID);
         sendKernel(message);
 
     }
@@ -39,11 +41,15 @@ public class RabbitBrokerImpl implements RabbitBroker {
 
     @Override
     public void confirmSend(Message message) {
+        message.setMessageType(MessageType.CONFIRM);
+        sendKernel(message);
 
     }
 
     @Override
     public void reliantSend(Message message) {
+        message.setMessageType(MessageType.CONFIRM);
+        sendKernel(message);
 
     }
 }

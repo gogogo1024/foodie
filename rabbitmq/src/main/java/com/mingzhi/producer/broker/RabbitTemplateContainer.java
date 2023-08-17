@@ -3,6 +3,10 @@ package com.mingzhi.producer.broker;
 import com.google.common.base.Splitter;
 import com.mingzhi.api.Message;
 import com.mingzhi.api.MessageType;
+import com.mingzhi.common.convert.GenericMessageConverter;
+import com.mingzhi.common.convert.RabbitMessageConverter;
+import com.mingzhi.common.serializer.SerializerFactory;
+import com.mingzhi.common.serializer.impl.JacksonSerializerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
@@ -25,6 +29,7 @@ import java.util.Objects;
  */
 public class RabbitTemplateContainer implements RabbitTemplate.ConfirmCallback {
     private final Splitter splitter = Splitter.on("#");
+    private SerializerFactory serializerFactor = JacksonSerializerFactory.INSTANCE;
     private Map<String, RabbitTemplate> rabbitTemplateMap = new HashMap<>();
     @Autowired
     private ConnectionFactory connectionFactory;
@@ -63,9 +68,15 @@ public class RabbitTemplateContainer implements RabbitTemplate.ConfirmCallback {
         rabbitTemplate1.setExchange(topic);
         rabbitTemplate1.setRetryTemplate(new RetryTemplate());
         rabbitTemplate1.setRoutingKey(message.getRoutingKey());
-        // TODO 高性能序列化
-//            rabbitTemplate1.setMessageConverter("");
+        // 序列化以及反序列化
+        // 发消息: 自定义message通过springframework转换成ampqMessage）
+        // 收消息: ampqMessage通过JacksonSerializer转换成自定义message）
+        GenericMessageConverter genericMessageConverter = new GenericMessageConverter(
+                serializerFactor.create());
+        RabbitMessageConverter rabbitMessageConverter = new RabbitMessageConverter(genericMessageConverter);
+        rabbitTemplate1.setMessageConverter(rabbitMessageConverter);
         String messageType = message.getMessageType();
+        // 除了rapid send 都需要确认回调
         if (!Objects.equals(messageType, MessageType.RAPID)) {
             rabbitTemplate1.setConfirmCallback(this);
         }
